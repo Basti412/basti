@@ -9,10 +9,11 @@
   const MOD = Object.fromEntries(MODULES.map((m) => [m.id, m]));
 
   /* ---------- Zustand ---------- */
+  const UI_DEFAULT = { mode: 'fokus', text: 'normal', autoNext: true, calm: false, pause: true, speak: true };
   let state = blank();
-  function blank() { return { v: 1, answers: {}, ablauf: {}, praxen: [], demo: false, updated: null }; }
+  function blank(keepUi) { return { v: 1, answers: {}, ablauf: {}, praxen: [], demo: false, updated: null, pos: {}, last: null, ui: Object.assign({}, UI_DEFAULT, keepUi || {}) }; }
   function load() {
-    try { const raw = localStorage.getItem(STORE_KEY); if (raw) state = Object.assign(blank(), JSON.parse(raw)); } catch (e) { /* Speicher nicht verfügbar */ }
+    try { const raw = localStorage.getItem(STORE_KEY); if (raw) { const o = JSON.parse(raw); state = Object.assign(blank(o.ui), o, { ui: Object.assign({}, UI_DEFAULT, o.ui || {}) }); } } catch (e) { /* Speicher nicht verfügbar */ }
   }
   let saveTimer = null; let storageOk = true;
   function save() {
@@ -227,14 +228,110 @@
     const p = progress(m);
     const pct = p.total ? Math.round((p.done / p.total) * 100) : 0;
     const tag = m.required ? '<span class="pill pill-req">Pflicht für die Auswertung</span>' : m.recommended ? '<span class="pill pill-rec">Empfohlen</span>' : '';
-    const mins = MODULE_MINUTES[m.id] ? `<span class="pill">ca. ${MODULE_MINUTES[m.id]} Min.</span>` : '';
+    const rest = minutesLeft(m);
+    const mins = MODULE_MINUTES[m.id] ? `<span class="pill" data-rest="${m.id}">${restLabel(m, rest)}</span>` : '';
+    // Kurzfassung zuerst, Details auf Wunsch (weniger Text auf einen Blick)
+    let intro = '';
+    if (m.intro) {
+      const cut = m.intro.search(/[.!?]\s/);
+      const first = cut > 0 ? m.intro.slice(0, cut + 1) : m.intro;
+      const more = cut > 0 ? m.intro.slice(cut + 2) : '';
+      intro = `<p class="intro">${esc(first)}</p>${more || m.instrument ? `<details class="more"><summary>Mehr dazu</summary>${more ? `<p>${esc(more)}</p>` : ''}${m.instrument ? `<p class="instrument">${esc(m.instrument)}</p>` : ''}</details>` : ''}`;
+    }
+    const toggle = focusable(m) ? `<div class="mode" role="group" aria-label="Ansicht"><button class="${isFocus(m) ? 'on' : ''}" data-act="mode" data-v="fokus" aria-pressed="${isFocus(m)}">Eine Frage pro Seite</button><button class="${isFocus(m) ? '' : 'on'}" data-act="mode" data-v="liste" aria-pressed="${!isFocus(m)}">Alle auf einmal</button></div>` : '';
     return `<header class="mod-head"><p class="eyebrow">${esc(m.group)}</p><h1>${esc(m.title)}</h1>
       <div class="pills">${tag}${mins}</div>
-      ${m.instrument ? `<p class="instrument">${esc(m.instrument)}</p>` : ''}
-      ${m.intro ? `<p class="intro">${esc(m.intro)}</p>` : ''}
+      ${intro}${toggle}
       ${p.total ? `<div class="mod-progress" data-prog="${m.id}"><div class="bar"><span style="width:${pct}%"></span></div><span class="ptxt">${p.done} von ${p.total} beantwortet</span></div>` : ''}
     </header>`;
   }
+  function minutesLeft(m) { const p = progress(m); const t = MODULE_MINUTES[m.id] || 0; return p.total ? Math.ceil(t * (1 - p.done / p.total)) : t; }
+  function restLabel(m, rest) { return complete(m) ? 'Fertig' : progress(m).done ? `noch ca. ${Math.max(1, rest)} Min.` : `ca. ${MODULE_MINUTES[m.id]} Min.`; }
+
+  /* ---------- Fokus-Modus: eine Frage bzw. ein Abschnitt pro Bildschirm ---------- */
+  const focusable = (m) => ['scale', 'dsm', 'fremd', 'form'].includes(m.type);
+  const isFocus = (m) => focusable(m) && state.ui.mode === 'fokus';
+  function stepsOf(m) {
+    const s = [];
+    if (m.type === 'fremd') s.push({ kind: 'fields', title: 'Wer füllt diesen Bogen aus?', fields: FREMD_FIELDS });
+    if (m.type === 'form') m.sections.forEach((sec) => s.push({ kind: 'fields', title: sec.title, fields: sec.fields }));
+    const items = itemsOf(m);
+    items.forEach((it, i) => s.push({ kind: 'item', it, n: i + 1, total: items.length }));
+    if (m.type === 'dsm' && m.extra) s.push({ kind: 'fields', title: 'Zum Schluss: Beginn, Dauer und Lebensbereiche', fields: m.extra });
+    if (m.type === 'fremd') s.push({ kind: 'fields', title: 'Möchten Sie noch etwas mitteilen?', fields: [{ id: 'kommentar', label: 'Ihre Anmerkung für die Ärztin/den Arzt (freiwillig)', type: 'textarea' }] });
+    return s;
+  }
+  function stepDone(m, st) {
+    if (st.kind === 'item') return filled(val(m.id, st.it.id));
+    return st.fields.every((f) => !f.req || filled(val(m.id, f.id)));
+  }
+  function firstOpen(m) { const s = stepsOf(m); const i = s.findIndex((st) => !stepDone(m, st)); return i < 0 ? s.length : i; }
+  function posOf(m) { const s = stepsOf(m); let p = state.pos[m.id]; if (p == null || p > s.length) p = firstOpen(m); return Math.max(0, Math.min(p, s.length)); }
+  function itemText(m, it) {
+    if (m.type === 'dsm') return m.which === 'adult' ? it.adult : it.child;
+    if (m.type === 'fremd') return 'Die Person ' + DSM_SHORT[it.id][m.which === 'adult' ? 0 : 1] + '.';
+    return it.text;
+  }
+  function itemGroup(m, it) {
+    if (m.type === 'dsm' || m.type === 'fremd') return it.dom === 'IA' ? 'Aufmerksamkeit' : 'Unruhe und Impulsivität';
+    if (m.grouped) return it[m.grouped];
+    if (m.type === 'scale' && m.id === 'asrs') return it.part === 'A' ? 'Teil A' : 'Teil B';
+    return '';
+  }
+  const hasExample = (m) => m.type === 'dsm' || m.type === 'fremd';
+  const PAUSE_EVERY = 9;
+
+  function viewFocus(m) {
+    return header(m) + `<section class="focus" id="focus" data-mod="${m.id}" aria-live="polite">${focusInner(m)}</section>` + (m.id === 'phq9' ? crisisBox(true) : '') + navFooter(m);
+  }
+  function focusInner(m) {
+    const steps = stepsOf(m); const i = posOf(m); state.pos[m.id] = i;
+    const dots = `<div class="f-dots" aria-hidden="true">${steps.map((st, k) => `<span class="${k === i ? 'cur' : stepDone(m, st) ? 'ok' : ''}"></span>`).join('')}</div>`;
+    if (i >= steps.length) return dots + doneCard(m);
+    const st = steps[i];
+    const pre = `<div class="f-top"><span class="f-count">Schritt ${i + 1} von ${steps.length}</span>${st.kind === 'item' && itemGroup(m, st.it) ? `<span class="f-grp">${esc(itemGroup(m, st.it))}</span>` : ''}</div>`;
+    let body = '';
+    if (st.kind === 'item') {
+      const it = st.it; const v = val(m.id, it.id); const name = `fx-${m.id}-${it.id}`;
+      const lead = m.type === 'fremd' ? `<p class="f-lead">${m.which === 'adult' ? 'In den letzten 6 Monaten:' : 'Als Kind (ca. 5–12 Jahre):'}</p>` : m.type === 'dsm' ? `<p class="f-lead">${m.which === 'adult' ? 'In den letzten 6 Monaten:' : 'Als Kind (ca. 5–12 Jahre):'} <span class="code">${it.code}</span></p>` : (m.id === 'phq9' || m.id === 'gad7') ? '<p class="f-lead">In den letzten 2 Wochen:</p>' : '';
+      const opts = SCALES[m.scale].map((o, k) => `<label class="f-opt"><input type="radio" name="${name}" id="${name}-${o.v}" data-mod="${m.id}" data-key="${it.id}" value="${o.v}" ${String(v) === String(o.v) ? 'checked' : ''}><span><kbd>${k + 1}</kbd>${esc(o.l)}</span></label>`).join('');
+      const ex = hasExample(m) ? `<details class="ex" ${filled(val(m.id, it.id + '_ex')) ? 'open' : ''}><summary>Beispiel notieren (freiwillig, hilft im Arztgespräch)</summary><textarea id="${name}-ex" data-mod="${m.id}" data-key="${it.id}_ex" rows="2" placeholder="Ein konkreter Moment, Stichworte reichen">${esc(val(m.id, it.id + '_ex'))}</textarea></details>` : '';
+      body = `<div class="f-card">${lead}<h2 class="f-q" id="fq">${esc(itemText(m, it))}</h2>${speakBtn()}<div class="f-opts" role="radiogroup" aria-labelledby="fq">${opts}</div>${ex}</div>`;
+    } else {
+      body = `<div class="f-card"><h2 class="f-q">${esc(st.title)}</h2><div class="fields">${st.fields.map((f) => fieldHtml(m.id, f)).join('')}</div></div>`;
+    }
+    const pause = i > 0 && i % PAUSE_EVERY === 0 && st.kind === 'item' ? `<p class="f-pause">Gute Stelle für eine Pause. Alles ist gespeichert – Sie machen später genau hier weiter.</p>` : '';
+    const canNext = stepDone(m, st);
+    const nav = `<div class="f-nav"><button class="btn ghost" data-act="f-prev" ${i === 0 ? 'disabled' : ''}>← Zurück</button><button class="btn ${canNext ? 'primary' : ''}" data-act="f-next">${canNext ? 'Weiter →' : 'Später beantworten →'}</button></div>`;
+    const keys = st.kind === 'item' ? `<p class="f-keys">Tastatur: <kbd>1</kbd>–<kbd>${SCALES[m.scale].length}</kbd> antworten · <kbd>←</kbd> zurück · <kbd>→</kbd> weiter</p>` : '';
+    return dots + pre + pause + body + nav + keys;
+  }
+  function doneCard(m) {
+    const open = stepsOf(m).filter((st) => !stepDone(m, st)).length;
+    const nxt = nextModule(m.id);
+    if (open) return `<div class="f-card f-end"><h2 class="f-q">Fast geschafft</h2><p>${open === 1 ? 'Eine Frage ist' : `${open} Fragen sind`} noch offen. Sie können sie jetzt oder später beantworten.</p><div class="row"><button class="btn primary" data-act="f-open">Zur ersten offenen Frage</button>${nxt ? `<a class="btn ghost" href="#${nxt.id}">Erst mit „${esc(nxt.title)}“ weitermachen</a>` : ''}</div></div>`;
+    return `<div class="f-card f-end is-ok"><div class="f-check" aria-hidden="true">✓</div><h2 class="f-q">Geschafft: ${esc(m.title)}</h2><p>Alle Antworten sind gespeichert.${nxt ? ` Als Nächstes: <b>${esc(nxt.title)}</b> (${restLabel(nxt, minutesLeft(nxt))}).` : ''}</p>
+      <div class="row">${nxt ? `<a class="btn primary" href="#${nxt.id}">Weiter zu „${esc(nxt.title)}“</a>` : ''}<a class="btn ghost" href="#start">Zur Übersicht</a><button class="btn ghost" data-act="mode" data-v="liste">Antworten prüfen</button></div></div>`;
+  }
+  function nextModule(fromId) {
+    // zuerst die nächste unvollständige Pflicht-Etappe, sonst die nächste empfohlene
+    const order = MODULES.filter((x) => x.required || x.recommended);
+    const i = order.findIndex((x) => x.id === fromId);
+    const after = order.slice(i + 1).concat(order.slice(0, Math.max(0, i)));
+    return after.find((x) => x.required && !complete(x)) || after.find((x) => !complete(x)) || (allRequiredDone() ? MOD.auswertung : null);
+  }
+  function speakBtn() { return state.ui.speak && 'speechSynthesis' in window ? '<button class="btn small ghost f-speak" data-act="speak" aria-label="Frage vorlesen">Vorlesen</button>' : ''; }
+  function goStep(m, i) {
+    const n = stepsOf(m).length;
+    state.pos[m.id] = Math.max(0, Math.min(i, n)); save();
+    const f = $('#focus'); if (!f) return;
+    f.innerHTML = focusInner(m);
+    const first = f.querySelector('.f-opt input:checked') || f.querySelector('.f-opt input, .f-card input, .f-card select, .f-card textarea, .f-card .btn');
+    if (first) first.focus({ preventScroll: true });
+    const top = f.getBoundingClientRect().top;
+    if (top < 60 || top > window.innerHeight * 0.5) f.scrollIntoView({ block: 'start', behavior: reduceMotion() ? 'auto' : 'smooth' });
+  }
+  const reduceMotion = () => state.ui.calm || matchMedia('(prefers-reduced-motion: reduce)').matches;
   function navFooter(m) {
     const order = MODULES.filter((x) => x.type !== 'dashboard');
     const i = order.findIndex((x) => x.id === m.id);
@@ -342,24 +439,36 @@
     const req = requiredMods();
     const reqDone = req.filter(complete).length;
     const allProg = MODULES.reduce((acc, m) => { const p = progress(m); acc.t += p.total; acc.d += p.done; return acc; }, { t: 0, d: 0 });
-    const pct = Math.round((allProg.d / allProg.t) * 100);
     const card = (m) => {
       const p = progress(m); const c = complete(m);
       const st = c ? '<span class="pill pill-ok">Fertig</span>' : p.done ? `<span class="pill pill-wip">${p.done}/${p.total}</span>` : '<span class="pill">Offen</span>';
-      return `<a class="mcard ${c ? 'is-done' : ''}" href="#${m.id}"><span class="mt">${esc(m.title)}</span><span class="mm">${m.required ? 'Pflicht' : 'Empfohlen'} · ca. ${MODULE_MINUTES[m.id] || 3} Min.</span>${st}</a>`;
+      return `<a class="mcard ${c ? 'is-done' : ''}" href="#${m.id}"><span class="mt">${esc(m.title)}</span><span class="mm">${m.required ? 'Pflicht' : 'Empfohlen'} · ${restLabel(m, minutesLeft(m))}</span>${st}</a>`;
     };
+    const nxt = resumeTarget();
+    const restAll = MODULES.filter((m) => (m.required || m.recommended) && !complete(m)).reduce((t, m) => t + minutesLeft(m), 0);
+    const restReq = requiredMods().filter((m) => !complete(m)).reduce((t, m) => t + minutesLeft(m), 0);
+    const np = progress(nxt);
+    const started = allProg.d > 0;
     return `<header class="hero"><p class="eyebrow">Vorbereitung auf die Facharzt-Diagnostik</p>
       <h1>Ihre ADHS-Diagnosemappe</h1>
-      <p class="intro">Alles, was bei der ADHS-Diagnostik von Erwachsenen in Deutschland abgefragt wird, an einem Ort: Screening, Symptomchecklisten für heute und die Kindheit, Fremdbeurteilungen, Abgrenzung zu anderen Erkrankungen, Lebensgeschichte und Unterlagen. Am Ende steht ein Bericht für Ihre Ärztin oder Ihren Arzt und eine unverbindliche Einschätzung.</p>
-      <div class="hero-stats">
-        <div class="stat"><span class="sv">${pct} %</span><span class="sl">insgesamt beantwortet</span></div>
-        <div class="stat"><span class="sv">${reqDone} / ${req.length}</span><span class="sl">Pflichtmodule fertig</span></div>
-        <div class="stat"><span class="sv">${MODULES.filter((m) => m.recommended && complete(m)).length} / ${MODULES.filter((m) => m.recommended).length}</span><span class="sl">empfohlene Module</span></div>
-      </div>
-      <div class="hero-actions"><a class="btn primary" href="#${(req.find((m) => !complete(m)) || MOD.auswertung).id}">${reqDone === 0 ? 'Jetzt beginnen' : reqDone === req.length ? 'Zur Auswertung' : 'Weitermachen'}</a><a class="btn ghost" href="#ablauf">Diagnoseweg ansehen</a></div>
+      <p class="intro">Fragebögen, Checklisten und Unterlagen für die ADHS-Diagnostik – in kleinen Etappen. Am Ende steht ein Bericht für Ihre Ärztin oder Ihren Arzt.</p>
     </header>
     ${state.demo ? '<aside class="demo-banner">Es sind <b>Beispieldaten</b> geladen. Sie sind erfunden und nicht Ihre Angaben. <button class="btn small" data-act="reset-ask">Beispieldaten entfernen</button></aside>' : ''}
+    <section class="next-step" aria-labelledby="ns-h">
+      <p class="eyebrow">${reqDone === req.length && nxt.type === 'report' ? 'Alles Wichtige ist erledigt' : started ? 'Hier geht es weiter' : 'Ihr erster Schritt'}</p>
+      <h2 id="ns-h">${esc(nxt.title)}</h2>
+      <p class="ns-meta">${nxt.type === 'report' ? 'Einschätzung und Bericht ansehen' : `${np.done ? `${np.done} von ${np.total} beantwortet · ` : ''}${restLabel(nxt, minutesLeft(nxt))}`}</p>
+      <a class="btn primary big" href="#${nxt.id}">${nxt.type === 'report' ? 'Zur Auswertung' : np.done ? 'Weitermachen' : 'Starten'} →</a>
+      <p class="help">Sie müssen nicht alles auf einmal schaffen. Jede Antwort wird sofort gespeichert.</p>
+    </section>
+    <div class="hero-stats">
+      <div class="stat"><span class="sv">${reqDone} / ${req.length}</span><span class="sl">Pflicht-Etappen fertig</span><div class="sbar"><span style="width:${Math.round(reqDone / req.length * 100)}%"></span></div></div>
+      <div class="stat"><span class="sv">${restReq ? `ca. ${restReq} Min.` : 'fertig'}</span><span class="sl">bis zur Auswertung</span></div>
+      <div class="stat"><span class="sv">${restAll ? `ca. ${restAll} Min.` : 'fertig'}</span><span class="sl">für alles inklusive Empfehlungen</span></div>
+    </div>
+    <details class="all-mods" ${started ? '' : ''}><summary>Alle Etappen anzeigen (${MODULES.filter((m) => m.required || m.recommended).length})</summary>
     ${groups.map((g) => `<section class="mgroup"><h2>${esc(g)}</h2><div class="mgrid">${MODULES.filter((m) => m.group === g && !['dashboard', 'ablauf', 'report'].includes(m.type)).map(card).join('')}</div></section>`).join('')}
+    <p><a href="#ablauf">Wie läuft die Diagnostik in Deutschland ab?</a></p></details>
     <section class="card two">
       <div><h2>So nutzen Sie die Mappe</h2><ul class="plain">
         <li>Sie können in beliebiger Reihenfolge arbeiten und jederzeit pausieren.</li>
@@ -510,10 +619,31 @@
     const id = current(); const m = MOD[id];
     $('#nav').innerHTML = navHtml(id);
     const views = { dashboard: viewDashboard, ablauf: () => viewAblauf(m), form: () => viewForm(m), scale: () => viewScale(m), dsm: () => viewDsm(m), fremd: () => viewFremd(m), checklist: () => viewChecklist(m), report: viewReport };
-    $('#main').innerHTML = views[m.type]();
+    $('#main').innerHTML = isFocus(m) ? viewFocus(m) : views[m.type]();
     $('#mobile-title').textContent = m.title;
     document.body.classList.remove('nav-open');
+    if (m.required || m.recommended) { state.last = id; save(); }
+    doneBefore[id] = complete(m);
+    applyUi();
     updateTopProgress();
+  }
+  const doneBefore = {};
+  function applyUi() {
+    const r = document.documentElement;
+    r.dataset.text = state.ui.text;
+    document.body.classList.toggle('calm', !!state.ui.calm);
+    const p = $('#settings'); if (!p) return;
+    p.querySelectorAll('[data-ui]').forEach((el) => {
+      const k = el.dataset.ui;
+      if (el.type === 'checkbox') el.checked = !!state.ui[k];
+      else if (el.type === 'radio') el.checked = state.ui[k] === el.value;
+    });
+  }
+  function toast(html, ms = 6000) {
+    const t = $('#toast'); if (!t) return;
+    t.innerHTML = `<div class="toast-in">${html}<button class="icon-btn" data-act="toast-x" aria-label="Hinweis schließen">✕</button></div>`;
+    t.hidden = false;
+    clearTimeout(toast.tm); if (ms) toast.tm = setTimeout(() => { t.hidden = true; }, ms);
   }
   function updateTopProgress() {
     const req = requiredMods(); const done = req.filter(complete).length;
@@ -526,12 +656,32 @@
     if (pb) { pb.querySelector('.bar span').style.width = Math.round((p.done / p.total) * 100) + '%'; pb.querySelector('.ptxt').textContent = `${p.done} von ${p.total} beantwortet`; }
     const nb = document.querySelector(`[data-nb="${mid}"]`);
     if (nb) { nb.textContent = c ? '✓' : `${p.done}/${p.total}`; nb.className = `nb ${c ? 'ok' : p.done ? 'wip' : ''}`; }
+    const rp = document.querySelector(`[data-rest="${mid}"]`); if (rp) rp.textContent = restLabel(m, minutesLeft(m));
+    // Fokus-Ansicht: Punkte und Weiter-Knopf aktualisieren, ohne die Eingabe zu stören
+    const f = $('#focus');
+    if (f && f.dataset.mod === mid) {
+      const steps = stepsOf(m); const i = posOf(m);
+      f.querySelectorAll('.f-dots span').forEach((d, k) => { d.className = k === i ? 'cur' : stepDone(m, steps[k]) ? 'ok' : ''; });
+      const nb2 = f.querySelector('[data-act="f-next"]');
+      if (nb2 && steps[i]) { const ok = stepDone(m, steps[i]); nb2.classList.toggle('primary', ok); nb2.textContent = ok ? 'Weiter →' : 'Später beantworten →'; }
+    }
+    if (c && !doneBefore[mid] && !state.demo) {
+      const nxt = nextModule(mid);
+      if (!isFocus(m)) toast(`<b>Geschafft: ${esc(m.title)}</b>${nxt ? ` · Als Nächstes: <a href="#${nxt.id}">${esc(nxt.title)}</a>` : ''}`);
+    }
+    doneBefore[mid] = c;
     updateTopProgress();
   }
 
   /* ---------- Eingaben ---------- */
   function onInput(e) {
     const el = e.target;
+    if (el.dataset.ui) {
+      if (e.type !== 'change') return;
+      const k = el.dataset.ui; state.ui[k] = el.type === 'checkbox' ? el.checked : el.value; save();
+      if (k === 'speak') render(); else applyUi();
+      return;
+    }
     if (el.dataset.ablauf) { state.ablauf[el.dataset.ablauf] = el.checked; el.closest('.step').classList.toggle('is-done', el.checked); save(); return; }
     if (el.dataset.px !== undefined) { state.praxen[Number(el.dataset.px)][el.dataset.pk] = el.value; save(); return; }
     const mid = el.dataset.mod, key = el.dataset.key; if (!mid || !key) return;
@@ -550,6 +700,12 @@
       const fs = el.closest('.item'); if (fs) fs.classList.add('is-done');
       if (mid === 'phq9' && key === 'p9') { const slot = $('#crisis-slot'); if (slot) slot.outerHTML = crisisBox(true); }
       if (e.type === 'change' && fs) autoAdvance(fs);
+      const m = MOD[mid];
+      if (el.closest('.f-opts') && isFocus(m) && state.ui.autoNext && !hasExample(m)) {
+        const at = posOf(m);
+        clearTimeout(onInput.tm);
+        onInput.tm = setTimeout(() => { if (posOf(m) === at && current() === mid) goStep(m, at + 1); }, reduceMotion() ? 120 : 320);
+      }
     } else if (el.type === 'range') {
       a[key] = Number(el.value); el.dataset.touched = '1'; const o = el.parentElement.querySelector('output'); if (o) o.textContent = el.value;
     } else {
@@ -577,7 +733,7 @@
   }
   function importData(obj) {
     if (!obj || typeof obj !== 'object' || !obj.answers) throw new Error('Kein gültiger Datensatz');
-    state = Object.assign(blank(), obj); save(); render(); msg('Daten geladen.');
+    state = Object.assign(blank(state.ui), obj, { ui: Object.assign({}, UI_DEFAULT, obj.ui || state.ui) }); save(); render(); msg('Daten geladen.');
   }
 
   function onClick(e) {
@@ -596,17 +752,52 @@
     if (act === 'reset-ask') {
       const slot = $('#reset-confirm');
       if (slot) slot.innerHTML = 'Wirklich alles löschen? <button class="btn small danger" data-act="reset">Ja, löschen</button> <button class="btn small ghost" data-act="reset-no">Abbrechen</button>';
-      else { state = blank(); save(); render(); }
+      else { state = blank(state.ui); save(); render(); }
     }
     if (act === 'reset-no') $('#reset-confirm').innerHTML = '';
-    if (act === 'reset') { state = blank(); try { localStorage.removeItem(STORE_KEY); } catch (err) { /* */ } render(); msg('Alle Angaben wurden gelöscht.'); }
+    if (act === 'reset') { state = blank(state.ui); try { localStorage.removeItem(STORE_KEY); } catch (err) { /* */ } render(); msg('Alle Angaben wurden gelöscht.'); }
     if (act === 'demo') { loadDemo(); render(); }
     if (act === 'menu') document.body.classList.toggle('nav-open');
+    const m = MOD[current()];
+    if (act === 'mode') { state.ui.mode = b.dataset.v; save(); render(); const f = $('#focus') || $('.items'); if (f && b.dataset.v === 'liste') window.scrollTo(0, 0); }
+    if (act === 'f-prev') goStep(m, posOf(m) - 1);
+    if (act === 'f-next') goStep(m, posOf(m) + 1);
+    if (act === 'f-open') goStep(m, firstOpen(m));
+    if (act === 'speak') speak();
+    if (act === 'toast-x') $('#toast').hidden = true;
+    if (act === 'settings') { const p = $('#settings'); p.hidden = !p.hidden; $('.set-btn').setAttribute('aria-expanded', String(!p.hidden)); if (!p.hidden) { applyUi(); const f = p.querySelector('input:checked') || p.querySelector('input'); if (f) f.focus(); } else $('.set-btn').focus(); }
+    if (act === 'resume') { const t = resumeTarget(); location.hash = t.id; }
+  }
+  function speak() {
+    try {
+      const f = $('#focus'); if (!f) return;
+      const q = f.querySelector('.f-q'); if (!q) return;
+      const opts = [...f.querySelectorAll('.f-opt span')].map((x) => x.textContent.replace(/^\d/, '')).join(', ');
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance((f.querySelector('.f-lead') ? f.querySelector('.f-lead').textContent + ' ' : '') + q.textContent + (opts ? '. Antworten: ' + opts : ''));
+      u.lang = 'de-DE'; u.rate = 0.95; speechSynthesis.speak(u);
+    } catch (e) { /* Sprachausgabe nicht verfügbar */ }
+  }
+  function resumeTarget() {
+    const last = state.last && MOD[state.last];
+    if (last && !complete(last)) return last;
+    return requiredMods().find((x) => !complete(x)) || MODULES.find((x) => x.recommended && !complete(x)) || MOD.auswertung;
+  }
+  function onKey(e) {
+    const f = $('#focus'); if (!f || e.altKey || e.ctrlKey || e.metaKey) return;
+    const t = e.target; if (t.matches && t.matches('textarea, input[type="text"], input[type="number"], input[type="date"], select')) return;
+    const m = MOD[f.dataset.mod];
+    if (/^[1-9]$/.test(e.key)) {
+      const ins = f.querySelectorAll('.f-opt input'); const el = ins[Number(e.key) - 1];
+      if (el) { el.checked = true; el.dispatchEvent(new Event('change', { bubbles: true })); el.focus({ preventScroll: true }); e.preventDefault(); }
+    } else if (e.key === 'ArrowRight' && !t.matches('input[type="radio"]')) { goStep(m, posOf(m) + 1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft' && !t.matches('input[type="radio"]')) { goStep(m, posOf(m) - 1); e.preventDefault(); }
+    else if (e.key === 'Enter' && t.matches('input[type="radio"]')) { goStep(m, posOf(m) + 1); e.preventDefault(); }
   }
 
   /* ---------- Beispieldaten (erfunden) ---------- */
   function loadDemo() {
-    const s = blank(); s.demo = true; const a = s.answers;
+    const s = blank(state.ui); s.demo = true; const a = s.answers;
     const pick = (arr, i) => arr[i % arr.length];
     a.person = { name: 'Beispielperson', geburt: 1991, geschlecht: 'weiblich', versicherung: 'Gesetzlich (GKV)', taetigkeit: 'Projektkoordinatorin', anlass: 'Mein Sohn wurde letztes Jahr diagnostiziert, ich erkenne mich in vielem wieder.', ausloeser: ['Eigenes Kind oder Verwandte mit ADHS-Diagnose', 'Probleme in Beruf/Studium'], beschwerden: '1. Ich verpasse Fristen, obwohl ich sie kenne. 2. Ich verliere ständig Schlüssel und Unterlagen. 3. Ich bin abends innerlich so unruhig, dass ich nicht einschlafen kann.', seit: 'Schon immer / seit der Kindheit', leidensdruck: 7, eltern: 'Ja, ein Elternteil', partner: 'Ja' };
     a.asrs = {}; ASRS_ITEMS.forEach((it, i) => { a.asrs[it.id] = pick([3, 3, 4, 3, 2, 2, 3, 4, 3, 4, 3, 1, 3, 3, 2, 2, 2, 2], i); });
@@ -642,6 +833,20 @@
     fr.onload = () => { try { importData(JSON.parse(fr.result)); } catch (err) { msg('Die Datei konnte nicht gelesen werden.'); } };
     fr.readAsText(e.target.files[0]);
   });
-  window.addEventListener('hashchange', () => { render(); window.scrollTo(0, 0); });
+  document.addEventListener('keydown', onKey);
+  window.addEventListener('pagehide', () => { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) { /* */ } });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { const p = $('#settings'); if (p && !p.hidden) { p.hidden = true; $('.set-btn').setAttribute('aria-expanded', 'false'); $('.set-btn').focus(); } document.body.classList.remove('nav-open'); } });
+  document.addEventListener('click', (e) => { const p = $('#settings'); if (p && !p.hidden && !e.target.closest('#settings, .set-btn')) { p.hidden = true; $('.set-btn').setAttribute('aria-expanded', 'false'); } });
+  window.addEventListener('hashchange', () => { render(); window.scrollTo(0, 0); try { speechSynthesis.cancel(); } catch (e) { /* */ } });
+  // Pausen-Erinnerung: zählt nur Minuten, in denen tatsächlich geantwortet wurde
+  let lastAct = 0, activeMin = 0, nextPause = 20;
+  document.addEventListener('change', () => { lastAct = Date.now(); });
+  setInterval(() => {
+    if (Date.now() - lastAct < 90000) activeMin += 1;
+    if (state.ui.pause && activeMin >= nextPause) {
+      nextPause = activeMin + 20;
+      toast(`<b>Sie sind seit ${activeMin} Minuten dabei.</b> Alles ist gespeichert. Eine kurze Pause (Wasser, Bewegung) ist jederzeit möglich – Sie machen danach genau hier weiter.`, 0);
+    }
+  }, 60000);
   render();
 })();

@@ -17,6 +17,20 @@ Eine Web-App, mit der Erwachsene in Deutschland die fachärztliche ADHS-Diagnost
 | Vorbereitung | Unterlagen-Checkliste mit Status, Fragen für den Termin |
 | Ergebnis | Unverbindliche Einschätzung (erst wenn alle Pflichtmodule fertig sind), Bericht für die Praxis, Kopieren/Drucken/Sichern/Laden |
 
+## Bedienung für Menschen mit ADHS
+Die Oberfläche folgt Empfehlungen für kognitive Barrierefreiheit (W3C, „Making Content Usable for People with Cognitive and Learning Disabilities“):
+
+- **Eine Frage pro Bildschirm** (Standard): große Antwortflächen, nach der Antwort automatisch zur nächsten Frage. Bei Fragen mit Beispielfeld wird nicht automatisch weitergeschaltet. Die Listenansicht „Alle auf einmal“ ist jederzeit umschaltbar.
+- **Tastatur:** `1`–`5` antworten, `←`/`→` zurück/weiter, `Esc` schließt Menüs.
+- **Ein nächster Schritt** statt einer Wand aus Modulen: Die Übersicht zeigt nur die nächste Etappe mit Restzeit. Alle Etappen lassen sich aufklappen.
+- **Weitermachen, wo man aufgehört hat:** Die Position in jedem Fragebogen wird gespeichert.
+- **Kurze Texte:** Nur der erste Satz jeder Einleitung ist sichtbar, der Rest steht unter „Mehr dazu“.
+- **Restzeit** je Etappe und gesamt („noch ca. 6 Min.“), Fortschrittspunkte pro Frage.
+- **Pausen:** Hinweis „Gute Stelle für eine Pause“ nach je 9 Fragen und eine abschaltbare Erinnerung nach 20 Minuten aktiver Bearbeitung.
+- **Erfolgsmeldung** nach jeder abgeschlossenen Etappe mit direktem Link zur nächsten.
+- **Einstellungen („Ansicht“):** Textgröße (3 Stufen), automatisch weiter, ruhige Ansicht (ohne Seitenleiste, gedämpfte Farben, ohne Animationen), Pausen-Erinnerung, Vorlesen (Sprachausgabe des Browsers).
+- Leicht lesbare Schrift (Atkinson Hyperlegible), große Klickflächen, hell/dunkel, `prefers-reduced-motion` wird beachtet.
+
 ## Auswertungslogik (transparent im Bericht dargestellt)
 - **Kriterium A:** Ein Symptom zählt ab der Stufe „deutlich“. Erfüllt bei mindestens 5 von 9 in einem Bereich, grenzwertig bei 4.
 - **Screening:** Teil A positiv bei mindestens 4 von 6 auffälligen Antworten (Schwellen wie beim ASRS v1.1).

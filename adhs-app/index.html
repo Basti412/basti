@@ -19,7 +19,23 @@
   <span id="mobile-title" class="mobile-title"></span>
   <div class="top-prog" title="Fortschritt der Pflichtmodule"><div class="tp-bar"><span id="top-prog"></span></div><span id="top-prog-txt" class="tp-txt"></span></div>
   <span id="save-state" class="save-state" role="status">Lokal gespeichert</span>
+  <button class="btn small ghost set-btn" data-act="settings" aria-expanded="false" aria-controls="settings">Ansicht</button>
 </div>
+<section id="settings" class="settings" hidden aria-label="Ansicht anpassen">
+  <h2>Ansicht anpassen</h2>
+  <fieldset><legend>Textgröße</legend>
+    <div class="seg">
+      <label><input type="radio" name="ui-text" id="ui-text-n" data-ui="text" value="normal"><span>Normal</span></label>
+      <label><input type="radio" name="ui-text" id="ui-text-g" data-ui="text" value="gross"><span>Groß</span></label>
+      <label><input type="radio" name="ui-text" id="ui-text-s" data-ui="text" value="sehrgross"><span>Sehr groß</span></label>
+    </div></fieldset>
+  <label class="chk"><input type="checkbox" id="ui-auto" data-ui="autoNext"><span><b>Automatisch weiter</b><small>Nach einer Antwort erscheint sofort die nächste Frage.</small></span></label>
+  <label class="chk"><input type="checkbox" id="ui-calm" data-ui="calm"><span><b>Ruhige Ansicht</b><small>Seitenleiste ausblenden, gedämpfte Farben, keine Animationen.</small></span></label>
+  <label class="chk"><input type="checkbox" id="ui-pause" data-ui="pause"><span><b>Pausen-Erinnerung</b><small>Nach 20 Minuten aktiver Bearbeitung ein kurzer Hinweis.</small></span></label>
+  <label class="chk"><input type="checkbox" id="ui-speak" data-ui="speak"><span><b>Vorlesen-Knopf</b><small>Fragen werden auf Wunsch vorgelesen (sofern der Browser das kann).</small></span></label>
+  <button class="btn small" data-act="settings">Fertig</button>
+</section>
+<div id="toast" class="toast" role="status" hidden></div>
 <div class="layout">
   <nav id="nav" class="nav" aria-label="Module"></nav>
   <main id="main" class="main" tabindex="-1"></main>
