@@ -1,0 +1,31 @@
+# ADHS-Diagnosemappe
+
+Eine Web-App, mit der Erwachsene in Deutschland die fachärztliche ADHS-Diagnostik vorbereiten. Sie braucht keine Installation und keinen Server. Alle Angaben bleiben im Browser (`localStorage`).
+
+## Starten
+`index.html` im Browser öffnen. Ein Build-Schritt ist nicht nötig. Alternativ den Ordner über einen beliebigen statischen Webserver ausliefern, z. B. `python3 -m http.server`.
+
+## Inhalt
+| Bereich | Module |
+|---|---|
+| Überblick | Diagnoseweg in Deutschland (7 Schritte, DSM-5-Kriterien A–E, erwartete Instrumente), Tracker für die Facharztsuche |
+| Angaben | Persönliche Angaben, Anliegen, Leidensdruck, verfügbare Fremdauskünfte |
+| Selbstbeurteilung | Screening (ASRS-Typ, 18 Items, Teil A), Symptomcheckliste heute und Kindheit (18 DSM-5-Kriterien mit Beispielfeldern wie in DIVA-5), Kindheitsskala (WURS-Typ, 25 Items), Emotionen & Organisation (Wender-Utah-Themen), Beeinträchtigung im Alltag (WFIRS-Bereiche) |
+| Fremdbeurteilung | Bogen für Partner/in bzw. Freund/in (heute) und für Eltern/Geschwister (Kindheit) |
+| Abgrenzung | PHQ-9, GAD-7, AUDIT-C, Checkliste zu bipolarer Störung, Autismus, emotionaler Instabilität, Schlaf, Trauma, Zwang, Lernstörungen, Tics, körperlichen Ursachen und Substanzen |
+| Biografie | Schwangerschaft/Geburt, Entwicklung, Schule, Beruf, Beziehungen, Verkehr, Finanzen, Diagnosen, Medikamente, Herz-Kreislauf, Familienanamnese, Ressourcen |
+| Vorbereitung | Unterlagen-Checkliste mit Status, Fragen für den Termin |
+| Ergebnis | Unverbindliche Einschätzung (erst wenn alle Pflichtmodule fertig sind), Bericht für die Praxis, Kopieren/Drucken/Sichern/Laden |
+
+## Auswertungslogik (transparent im Bericht dargestellt)
+- **Kriterium A:** Ein Symptom zählt ab der Stufe „deutlich“. Erfüllt bei mindestens 5 von 9 in einem Bereich, grenzwertig bei 4.
+- **Screening:** Teil A positiv bei mindestens 4 von 6 auffälligen Antworten (Schwellen wie beim ASRS v1.1).
+- **Kindheit:** „deutlich“ bei mindestens 6 Symptomen in einem Bereich, oder bei mindestens 3 Symptomen plus Kindheitsskala ≥ 36/100. „teilweise“, wenn eines dieser Zeichen vorliegt oder ein Beginn vor dem 12. Lebensjahr angegeben ist.
+- **Kriterium C:** mindestens 2 Lebensbereiche. **Kriterium D:** mindestens 2 Alltagsbereiche mit „oft“ oder häufiger, oder Gesamtbeeinträchtigung „deutlich“/„schwer“.
+- **Stufen:** *deutlich* (A + Kindheit + C + D erfüllt, nicht nur phasenweise), *teilweise* (A erfüllt/grenzwertig oder Screening positiv), sonst *gering*.
+- Hinweise zur Abgrenzung (PHQ-9 ≥ 10, GAD-7 ≥ 10, AUDIT-C, Hypomanie, Autismus usw.) werden gesondert ausgewiesen.
+
+## Wichtige Hinweise
+- Die App stellt **keine Diagnose** und ist **nicht validiert**.
+- Geschützte Instrumente (ASRS, WURS-K, ADHS-SB/HASE, DIVA-5, CAARS, WRI, WFIRS) sind **nicht im Original** enthalten. Die App bildet ihre Inhalte mit eigenen Formulierungen ab. Wörtlich übernommen sind nur die frei verwendbaren Bögen PHQ-9, GAD-7 und AUDIT-C.
+- Der Orientierungswert der Kindheitsskala (36/100) ist aus dem WURS-K-Grenzwert (30 von 84) umgerechnet und nicht validiert.
