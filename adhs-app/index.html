@@ -18,22 +18,59 @@
   <a class="brand" href="#start"><span class="brand-mark" aria-hidden="true"></span><span>Diagnosemappe <b>ADHS</b></span></a>
   <span id="mobile-title" class="mobile-title"></span>
   <div class="top-prog" title="Fortschritt der Pflichtmodule"><div class="tp-bar"><span id="top-prog"></span></div><span id="top-prog-txt" class="tp-txt"></span></div>
-  <span id="save-state" class="save-state" role="status">Lokal gespeichert</span>
-  <button class="btn small ghost set-btn" data-act="settings" aria-expanded="false" aria-controls="settings">Ansicht</button>
+  <button class="btn small ghost set-btn" data-act="settings" aria-expanded="false" aria-controls="settings" aria-label="Einstellungen: Ansicht und Speichern"><span class="gear" aria-hidden="true">⚙</span><span class="set-lbl">Einstellungen</span></button>
 </div>
-<section id="settings" class="settings" hidden aria-label="Ansicht anpassen">
-  <h2>Ansicht anpassen</h2>
-  <fieldset><legend>Textgröße</legend>
-    <div class="seg">
-      <label><input type="radio" name="ui-text" id="ui-text-n" data-ui="text" value="normal"><span>Normal</span></label>
-      <label><input type="radio" name="ui-text" id="ui-text-g" data-ui="text" value="gross"><span>Groß</span></label>
-      <label><input type="radio" name="ui-text" id="ui-text-s" data-ui="text" value="sehrgross"><span>Sehr groß</span></label>
-    </div></fieldset>
-  <label class="chk"><input type="checkbox" id="ui-auto" data-ui="autoNext"><span><b>Automatisch weiter</b><small>Nach einer Antwort erscheint sofort die nächste Frage.</small></span></label>
-  <label class="chk"><input type="checkbox" id="ui-calm" data-ui="calm"><span><b>Ruhige Ansicht</b><small>Seitenleiste ausblenden, gedämpfte Farben, keine Animationen.</small></span></label>
-  <label class="chk"><input type="checkbox" id="ui-pause" data-ui="pause"><span><b>Pausen-Erinnerung</b><small>Nach 20 Minuten aktiver Bearbeitung ein kurzer Hinweis.</small></span></label>
-  <label class="chk"><input type="checkbox" id="ui-speak" data-ui="speak"><span><b>Vorlesen-Knopf</b><small>Fragen werden auf Wunsch vorgelesen (sofern der Browser das kann).</small></span></label>
-  <button class="btn small" data-act="settings">Fertig</button>
+<section id="settings" class="settings" hidden aria-label="Einstellungen">
+  <div class="tabs" role="tablist" aria-label="Einstellungen">
+    <button role="tab" id="tab-ansicht" aria-controls="pane-ansicht" aria-selected="true" data-act="tab" data-tab="ansicht">Ansicht</button>
+    <button role="tab" id="tab-speichern" aria-controls="pane-speichern" aria-selected="false" data-act="tab" data-tab="speichern" tabindex="-1">Speichern</button>
+  </div>
+  <div class="pane" id="pane-ansicht" role="tabpanel" aria-labelledby="tab-ansicht">
+    <fieldset><legend>Textgröße</legend>
+      <div class="seg">
+        <label><input type="radio" name="ui-text" id="ui-text-n" data-ui="text" value="normal"><span>Normal</span></label>
+        <label><input type="radio" name="ui-text" id="ui-text-g" data-ui="text" value="gross"><span>Groß</span></label>
+        <label><input type="radio" name="ui-text" id="ui-text-s" data-ui="text" value="sehrgross"><span>Sehr groß</span></label>
+      </div></fieldset>
+    <label class="chk"><input type="checkbox" id="ui-auto" data-ui="autoNext"><span><b>Automatisch weiter</b><small>Nach einer Antwort erscheint sofort die nächste Frage.</small></span></label>
+    <label class="chk"><input type="checkbox" id="ui-calm" data-ui="calm"><span><b>Ruhige Ansicht</b><small>Seitenleiste ausblenden, gedämpfte Farben, keine Animationen.</small></span></label>
+    <label class="chk"><input type="checkbox" id="ui-pause" data-ui="pause"><span><b>Pausen-Erinnerung</b><small>Nach 20 Minuten aktiver Bearbeitung ein kurzer Hinweis.</small></span></label>
+    <label class="chk"><input type="checkbox" id="ui-speak" data-ui="speak"><span><b>Vorlesen-Knopf</b><small>Fragen werden auf Wunsch vorgelesen (sofern der Browser das kann).</small></span></label>
+  </div>
+  <div class="pane" id="pane-speichern" role="tabpanel" aria-labelledby="tab-speichern" hidden>
+    <div class="store-note">
+      <p><b>Ihre Angaben werden nur lokal gespeichert.</b></p>
+      <p>Jede Antwort wird automatisch in diesem Browser auf diesem Gerät abgelegt. Es werden keine Daten an einen Server oder an Dritte übertragen. Sie müssen nichts tun, um zu speichern.</p>
+      <p class="save-status" id="save-status" role="status">Noch nichts gespeichert.</p>
+    </div>
+    <div class="pane-sec">
+      <h3>Wann Ihre Angaben verloren gehen können</h3>
+      <ul class="plain">
+        <li>wenn Sie Browserdaten, Verlauf oder Cookies löschen</li>
+        <li>in einem privaten bzw. Inkognito-Fenster, sobald es geschlossen wird</li>
+        <li>auf einem anderen Gerät oder in einem anderen Browser sind die Angaben nicht vorhanden</li>
+      </ul>
+      <p class="help">Legen Sie deshalb ab und zu eine Sicherung an, vor allem vor einem Gerätewechsel.</p>
+    </div>
+    <div class="pane-sec">
+      <h3>Sicherung anlegen</h3>
+      <div class="row">
+        <button class="btn small" data-act="export" data-top-only>Als Datei sichern</button>
+        <button class="btn small" data-act="copy-json">Als Code kopieren</button>
+      </div>
+      <p class="help">Die Sicherung enthält Gesundheitsdaten. Bewahren Sie sie sicher auf und schicken Sie sie nicht unverschlüsselt per E-Mail.</p>
+    </div>
+    <details class="pane-sec imp"><summary>Sicherung laden</summary>
+      <div class="fields">
+        <label class="lbl" for="imp-file">Datei auswählen (.json)</label><input type="file" id="imp-file" accept="application/json,.json">
+        <label class="lbl" for="imp-text">oder gesicherten Code einfügen</label><textarea id="imp-text" rows="3" placeholder='{"v":1, …}'></textarea>
+        <button class="btn small" data-act="import-text">Code laden</button>
+        <p class="help">Beim Laden werden die aktuellen Angaben auf diesem Gerät ersetzt.</p>
+      </div></details>
+    <div class="pane-sec danger-row"><button class="btn small danger" data-act="reset-ask">Alle Angaben löschen</button><span id="reset-confirm"></span></div>
+    <p class="help tool-msg" role="status"></p>
+  </div>
+  <button class="btn small done-btn" data-act="settings-close">Fertig</button>
 </section>
 <div id="toast" class="toast" role="status" hidden></div>
 <div class="layout">

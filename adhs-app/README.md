@@ -28,7 +28,9 @@ Die Oberfläche folgt Empfehlungen für kognitive Barrierefreiheit (W3C, „Maki
 - **Restzeit** je Etappe und gesamt („noch ca. 6 Min.“), Fortschrittspunkte pro Frage.
 - **Pausen:** Hinweis „Gute Stelle für eine Pause“ nach je 9 Fragen und eine abschaltbare Erinnerung nach 20 Minuten aktiver Bearbeitung.
 - **Erfolgsmeldung** nach jeder abgeschlossenen Etappe mit direktem Link zur nächsten.
-- **Einstellungen („Ansicht“):** Textgröße (3 Stufen), automatisch weiter, ruhige Ansicht (ohne Seitenleiste, gedämpfte Farben, ohne Animationen), Pausen-Erinnerung, Vorlesen (Sprachausgabe des Browsers).
+- **Einstellungsmenü oben rechts** mit zwei Reitern:
+  - **Speichern:** erklärt gleich oben, dass alle Angaben nur lokal in diesem Browser gespeichert werden, zeigt den Zeitpunkt der letzten Speicherung und nennt, wann Daten verloren gehen können. Dort liegen auch Sicherung (Datei/Code), Laden und Löschen.
+  - **Ansicht:** Textgröße (3 Stufen), automatisch weiter, ruhige Ansicht (ohne Seitenleiste, gedämpfte Farben, ohne Animationen), Pausen-Erinnerung, Vorlesen (Sprachausgabe des Browsers).
 - Leicht lesbare Schrift (Atkinson Hyperlegible), große Klickflächen, hell/dunkel, `prefers-reduced-motion` wird beachtet.
 
 ## Auswertungslogik (transparent im Bericht dargestellt)

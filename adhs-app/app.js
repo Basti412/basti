@@ -21,8 +21,18 @@
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => {
       try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); storageOk = true; } catch (e) { storageOk = false; }
-      const s = $('#save-state'); if (s) s.textContent = storageOk ? 'Lokal gespeichert' : 'Speichern nicht möglich – bitte exportieren';
+      showSaveStatus();
     }, 250);
+  }
+  function showSaveStatus() {
+    const el = $('#save-status'); const btn = $('.set-btn');
+    if (btn) btn.classList.toggle('warn', !storageOk);
+    if (!el) return;
+    if (!storageOk) { el.className = 'save-status bad'; el.textContent = 'Speichern ist in diesem Browser gerade nicht möglich (z. B. privates Fenster oder gesperrter Speicher). Bitte legen Sie jetzt eine Sicherung an.'; return; }
+    if (!state.updated) { el.className = 'save-status'; el.textContent = 'Noch keine Angaben gespeichert.'; return; }
+    const d = new Date(state.updated); const today = new Date().toDateString() === d.toDateString();
+    el.className = 'save-status ok';
+    el.textContent = `Zuletzt lokal gespeichert: ${today ? 'heute' : d.toLocaleDateString('de-DE')}, ${d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })} Uhr`;
   }
   const A = (mid) => (state.answers[mid] = state.answers[mid] || {});
   const val = (mid, key) => (state.answers[mid] || {})[key];
@@ -478,8 +488,8 @@
       <div><h2>Ihre Daten</h2><ul class="plain">
         <li>Alle Angaben bleiben ausschließlich in diesem Browser auf diesem Gerät.</li>
         <li>Es werden keine Daten an Server übertragen.</li>
-        <li>Sichern Sie Ihre Angaben über „Daten sichern“, bevor Sie Browserdaten löschen.</li></ul>
-        <div class="row"><button class="btn small" data-act="demo">Beispieldaten laden</button><a class="btn small ghost" href="#auswertung">Daten sichern / laden</a></div></div>
+        <li>Eine Sicherung legen Sie unter „Einstellungen → Speichern“ an.</li></ul>
+        <div class="row"><button class="btn small" data-act="settings" data-tab="speichern">Speichern &amp; Sichern</button><button class="btn small ghost" data-act="demo">Beispieldaten laden</button></div></div>
     </section>
     <p class="disclaimer">Diese Mappe ersetzt keine Diagnose. Eine ADHS-Diagnose kann nur eine Fachärztin, ein Facharzt oder eine approbierte Psychotherapeutin bzw. ein approbierter Psychotherapeut nach ausführlicher Untersuchung stellen.</p>`;
   }
@@ -513,19 +523,13 @@
     if (r.phq.item9 > 0) html += crisisBox(false);
 
     // Werkzeuge
-    html += `<section class="card tools no-print"><h2>Bericht und Daten</h2>
+    html += `<section class="card tools no-print"><h2>Bericht</h2>
       <div class="row">
         <button class="btn primary" data-act="copy-report">Bericht als Text kopieren</button>
         ${FRAMED ? '' : '<button class="btn" data-act="print">Drucken / als PDF speichern</button>'}
-        ${FRAMED ? '' : '<button class="btn" data-act="export">Daten als Datei sichern</button>'}
-        <button class="btn" data-act="copy-json">Daten als Code kopieren</button>
       </div>
-      <details class="imp"><summary>Gesicherte Daten laden</summary>
-        <div class="fields"><label class="lbl" for="imp-file">Datei auswählen (.json)</label><input type="file" id="imp-file" accept="application/json,.json">
-        <label class="lbl" for="imp-text">oder gesicherten Code einfügen</label><textarea id="imp-text" rows="3" placeholder='{"v":1, …}'></textarea>
-        <button class="btn" data-act="import-text">Code laden</button></div></details>
-      <div class="row danger-row"><button class="btn danger" data-act="reset-ask">Alle Angaben löschen</button><span id="reset-confirm"></span></div>
-      <p class="help" id="tool-msg" role="status"></p></section>`;
+      <p class="help">Ihre Angaben werden nur lokal in diesem Browser gespeichert. Sicherung, Laden und Löschen finden Sie unter <button class="linkish" data-act="settings" data-tab="speichern">Einstellungen → Speichern</button>.</p>
+      <p class="help tool-msg" role="status"></p></section>`;
 
     html += `<article class="report" id="report">${reportHtml(r, rec)}</article>`;
     return html;
@@ -723,11 +727,12 @@
     }
   }
 
-  function msg(t) { const m = $('#tool-msg'); if (m) m.textContent = t; }
+  function msg(t) { document.querySelectorAll('.tool-msg').forEach((m) => { m.textContent = t; }); }
   async function copy(text, okMsg) {
     try { await navigator.clipboard.writeText(text); msg(okMsg); }
     catch (e) {
-      const ta = $('#imp-text'); if (ta) { ta.closest('details').open = true; ta.value = text; ta.select(); }
+      openSettings('speichern');
+      const ta = $('#imp-text'); if (ta) { ta.closest('details').open = true; ta.value = text; ta.focus(); ta.select(); }
       msg('Kopieren wurde blockiert. Der Text ist unten markiert – bitte mit Strg+C bzw. „Kopieren“ übernehmen.');
     }
   }
@@ -755,7 +760,7 @@
       else { state = blank(state.ui); save(); render(); }
     }
     if (act === 'reset-no') $('#reset-confirm').innerHTML = '';
-    if (act === 'reset') { state = blank(state.ui); try { localStorage.removeItem(STORE_KEY); } catch (err) { /* */ } render(); msg('Alle Angaben wurden gelöscht.'); }
+    if (act === 'reset') { state = blank(state.ui); try { localStorage.removeItem(STORE_KEY); } catch (err) { /* */ } render(); showSaveStatus(); msg('Alle Angaben wurden gelöscht.'); }
     if (act === 'demo') { loadDemo(); render(); }
     if (act === 'menu') document.body.classList.toggle('nav-open');
     const m = MOD[current()];
@@ -765,8 +770,23 @@
     if (act === 'f-open') goStep(m, firstOpen(m));
     if (act === 'speak') speak();
     if (act === 'toast-x') $('#toast').hidden = true;
-    if (act === 'settings') { const p = $('#settings'); p.hidden = !p.hidden; $('.set-btn').setAttribute('aria-expanded', String(!p.hidden)); if (!p.hidden) { applyUi(); const f = p.querySelector('input:checked') || p.querySelector('input'); if (f) f.focus(); } else $('.set-btn').focus(); }
+    if (act === 'settings') { const p = $('#settings'); if (!p.hidden && !b.dataset.tab) closeSettings(); else openSettings(b.dataset.tab); }
+    if (act === 'settings-close') closeSettings();
+    if (act === 'tab') showTab(b.dataset.tab, true);
     if (act === 'resume') { const t = resumeTarget(); location.hash = t.id; }
+  }
+  function openSettings(tab) {
+    const p = $('#settings'); p.hidden = false; $('.set-btn').setAttribute('aria-expanded', 'true');
+    applyUi(); showSaveStatus(); showTab(tab || openSettings.last || 'ansicht', true);
+  }
+  function closeSettings() {
+    const p = $('#settings'); if (p.hidden) return;
+    p.hidden = true; $('.set-btn').setAttribute('aria-expanded', 'false'); $('.set-btn').focus();
+  }
+  function showTab(tab, focus) {
+    openSettings.last = tab;
+    document.querySelectorAll('#settings [role="tab"]').forEach((t) => { const on = t.dataset.tab === tab; t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1; if (on && focus) t.focus(); });
+    document.querySelectorAll('#settings [role="tabpanel"]').forEach((pn) => { pn.hidden = pn.id !== 'pane-' + tab; });
   }
   function speak() {
     try {
@@ -835,8 +855,13 @@
   });
   document.addEventListener('keydown', onKey);
   window.addEventListener('pagehide', () => { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) { /* */ } });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { const p = $('#settings'); if (p && !p.hidden) { p.hidden = true; $('.set-btn').setAttribute('aria-expanded', 'false'); $('.set-btn').focus(); } document.body.classList.remove('nav-open'); } });
-  document.addEventListener('click', (e) => { const p = $('#settings'); if (p && !p.hidden && !e.target.closest('#settings, .set-btn')) { p.hidden = true; $('.set-btn').setAttribute('aria-expanded', 'false'); } });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { closeSettings(); document.body.classList.remove('nav-open'); }
+    if ((e.key === 'ArrowRight' || e.key === 'ArrowLeft') && e.target.matches('#settings [role="tab"]')) { showTab(e.target.dataset.tab === 'ansicht' ? 'speichern' : 'ansicht', true); e.preventDefault(); }
+  });
+  document.addEventListener('click', (e) => { const p = $('#settings'); if (p && !p.hidden && !e.target.closest('#settings, [data-act="settings"]')) closeSettings(); });
+  if (FRAMED) document.querySelectorAll('[data-top-only]').forEach((el) => el.remove());
+  showSaveStatus();
   window.addEventListener('hashchange', () => { render(); window.scrollTo(0, 0); try { speechSynthesis.cancel(); } catch (e) { /* */ } });
   // Pausen-Erinnerung: zählt nur Minuten, in denen tatsächlich geantwortet wurde
   let lastAct = 0, activeMin = 0, nextPause = 20;
