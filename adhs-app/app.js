@@ -228,9 +228,9 @@
     const name = `r-${mid}-${it.id}`;
     const badge = opts.badge ? `<span class="code">${esc(opts.badge)}</span>` : '';
     const ex = opts.example ? `<details class="ex" ${filled(val(mid, it.id + '_ex')) ? 'open' : ''}><summary>Beispiel aus dem Alltag notieren</summary><textarea id="${name}-ex" data-mod="${mid}" data-key="${it.id}_ex" rows="2" placeholder="${esc(opts.placeholder || 'Konkretes Beispiel …')}">${esc(val(mid, it.id + '_ex'))}</textarea></details>` : '';
-    return `<fieldset class="item ${filled(v) ? 'is-done' : ''}" id="it-${mid}-${it.id}">
-      <legend><span class="num">${n}</span><span class="q">${badge}${esc(text)}</span></legend>
-      <div class="opts" style="--n:${SCALES[scale].length}">${SCALES[scale].map((o) => `<label><input type="radio" name="${name}" id="${name}-${o.v}" data-mod="${mid}" data-key="${it.id}" value="${o.v}" ${String(v) === String(o.v) ? 'checked' : ''}><span>${esc(o.l)}</span></label>`).join('')}</div>${ex}</fieldset>`;
+    return `<div class="item ${filled(v) ? 'is-done' : ''}" id="it-${mid}-${it.id}">
+      <div class="qrow"><span class="num" aria-hidden="true">${n}</span><span class="q" id="${name}-q">${badge}${esc(text)}</span></div>
+      <div class="opts" role="radiogroup" aria-labelledby="${name}-q" style="--n:${SCALES[scale].length}">${SCALES[scale].map((o) => `<label><input type="radio" name="${name}" id="${name}-${o.v}" data-mod="${mid}" data-key="${it.id}" value="${o.v}" ${String(v) === String(o.v) ? 'checked' : ''}><span>${esc(o.l)}</span></label>`).join('')}</div>${ex}</div>`;
   }
 
   /* ---------- Rendering: Ansichten ---------- */
