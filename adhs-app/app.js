@@ -11,9 +11,17 @@
   /* ---------- Zustand ---------- */
   const UI_DEFAULT = { mode: 'fokus', text: 'normal', autoNext: true, calm: false, pause: true, speak: true };
   let state = blank();
-  function blank(keepUi) { return { v: 1, answers: {}, ablauf: {}, praxen: [], demo: false, updated: null, pos: {}, last: null, ui: Object.assign({}, UI_DEFAULT, keepUi || {}) }; }
+  function blank(keepUi) { return { v: 1, answers: {}, ablauf: {}, praxen: [], updated: null, pos: {}, last: null, ui: Object.assign({}, UI_DEFAULT, keepUi || {}) }; }
   function load() {
-    try { const raw = localStorage.getItem(STORE_KEY); if (raw) { const o = JSON.parse(raw); state = Object.assign(blank(o.ui), o, { ui: Object.assign({}, UI_DEFAULT, o.ui || {}) }); } } catch (e) { /* Speicher nicht verfügbar */ }
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      if (raw) {
+        const o = JSON.parse(raw);
+        // Früher ladbare Beispieldaten nicht als eigene Angaben weiterführen
+        if (o.demo) { state = blank(o.ui); localStorage.setItem(STORE_KEY, JSON.stringify(state)); return; }
+        state = Object.assign(blank(o.ui), o, { ui: Object.assign({}, UI_DEFAULT, o.ui || {}) });
+      }
+    } catch (e) { /* Speicher nicht verfügbar */ }
   }
   let saveTimer = null; let storageOk = true;
   function save() {
@@ -623,7 +631,6 @@
       <h1>Ihre ADHS-Diagnosemappe</h1>
       <p class="intro">Fragebögen, Checklisten und Unterlagen für die ADHS-Diagnostik – in kleinen Etappen. Am Ende steht ein Bericht für Ihre Ärztin oder Ihren Arzt.</p>
     </header>
-    ${state.demo ? '<aside class="demo-banner">Es sind <b>Beispieldaten</b> geladen. Sie sind erfunden und nicht Ihre Angaben. <button class="btn small" data-act="reset-ask">Beispieldaten entfernen</button></aside>' : ''}
     <section class="next-step" aria-labelledby="ns-h">
       <p class="eyebrow">${reqDone === req.length && nxt.type === 'report' ? 'Alles Wichtige ist erledigt' : started ? 'Hier geht es weiter' : 'Ihr erster Schritt'}</p>
       <h2 id="ns-h">${esc(nxt.title)}</h2>
@@ -649,7 +656,7 @@
         <li>Alle Angaben bleiben ausschließlich in diesem Browser auf diesem Gerät.</li>
         <li>Es werden keine Daten an Server übertragen.</li>
         <li>Eine Sicherung legen Sie unter „Einstellungen → Speichern“ an.</li></ul>
-        <div class="row"><button class="btn small" data-act="settings" data-tab="speichern">Speichern &amp; Sichern</button><button class="btn small ghost" data-act="demo">Beispieldaten laden</button></div></div>
+        <div class="row"><button class="btn small" data-act="settings" data-tab="speichern">Speichern &amp; Sichern</button></div></div>
     </section>
     <p class="disclaimer">Diese Mappe ersetzt keine Diagnose. Eine ADHS-Diagnose kann nur eine Fachärztin, ein Facharzt oder eine approbierte Psychotherapeutin bzw. ein approbierter Psychotherapeut nach ausführlicher Untersuchung stellen.</p>`;
   }
@@ -663,7 +670,6 @@
     const rec = ready ? recommend(r) : null;
     let html = `<header class="mod-head"><p class="eyebrow">Ergebnis</p><h1>Auswertung &amp; Bericht</h1>
       <p class="intro">Oben steht die unverbindliche Gesamteinschätzung, danach die Tendenz jedes einzelnen Fragebogens. Darunter folgt der Bericht für Ihre Ärztin oder Ihren Arzt mit allen Ergebnissen, Ihren Beispielen und Ihrer Lebensgeschichte.</p></header>`;
-    if (state.demo) html += '<aside class="demo-banner">Beispieldaten: Diese Auswertung beruht auf erfundenen Angaben.</aside>';
     if (!ready) {
       html += `<section class="card gate"><h2>Noch ${missing.length} Pflichtmodul${missing.length > 1 ? 'e' : ''} offen</h2>
         <p>Die Einschätzung erscheint, sobald alle Pflichtmodule vollständig beantwortet sind. Erst dann sind die Ergebnisse untereinander vergleichbar.</p>
@@ -702,7 +708,7 @@
     const row = (k, v) => `<tr><th scope="row">${esc(k)}</th><td>${v}</td></tr>`;
     const st = (done) => (done ? '' : ' <span class="muted">(unvollständig)</span>');
     const tg = (id) => { const e = evalModule(id, r); return e.done ? `<span class="rtag lvl-${e.level} k-${e.kind}">${esc(e.tag)}</span>` : '<span class="muted">–</span>'; };
-    let h = `<header class="rep-head"><h2>Vorbereitungsbericht ADHS-Diagnostik (Erwachsene)</h2><p class="muted">Selbstauskunft, erstellt am ${new Date().toLocaleDateString('de-DE')}${state.demo ? ' · BEISPIELDATEN' : ''}</p></header>`;
+    let h = `<header class="rep-head"><h2>Vorbereitungsbericht ADHS-Diagnostik (Erwachsene)</h2><p class="muted">Selbstauskunft, erstellt am ${new Date().toLocaleDateString('de-DE')}</p></header>`;
     h += `<h3>1. Person und Anliegen</h3><div class="tbl-wrap"><table class="tbl kv"><tbody>
       ${row('Name', t(p.name))}${row('Geburtsjahr', t(p.geburt))}${row('Geschlecht', t(p.geschlecht))}${row('Versicherung', t(p.versicherung))}${row('Tätigkeit', t(p.taetigkeit))}${row('Hausarztpraxis', t(p.hausarzt))}
       ${row('Anlass', t(p.anlass))}${row('Auslöser des Verdachts', t(p.ausloeser))}${row('Hauptbeschwerden', t(p.beschwerden))}${row('Beschwerden seit', t(p.seit))}${row('Leidensdruck (0–10)', t(p.leidensdruck))}${row('Ziele', t(p.ziele))}
@@ -831,7 +837,7 @@
       const nb2 = f.querySelector('[data-act="f-next"]');
       if (nb2 && steps[i]) { const ok = stepDone(m, steps[i]); nb2.classList.toggle('primary', ok); nb2.textContent = ok ? 'Weiter →' : 'Später beantworten →'; }
     }
-    if (c && !doneBefore[mid] && !state.demo) {
+    if (c && !doneBefore[mid]) {
       const nxt = nextModule(mid);
       if (!isFocus(m)) toast(`<b>Geschafft: ${esc(m.title)}</b>${nxt ? ` · Als Nächstes: <a href="#${nxt.id}">${esc(nxt.title)}</a>` : ''}`);
     }
@@ -925,7 +931,6 @@
     }
     if (act === 'reset-no') $('#reset-confirm').innerHTML = '';
     if (act === 'reset') { state = blank(state.ui); try { localStorage.removeItem(STORE_KEY); } catch (err) { /* */ } render(); showSaveStatus(); msg('Alle Angaben wurden gelöscht.'); }
-    if (act === 'demo') { loadDemo(); render(); }
     if (act === 'menu') document.body.classList.toggle('nav-open');
     const m = MOD[current()];
     if (act === 'mode') { state.ui.mode = b.dataset.v; save(); render(); const f = $('#focus') || $('.items'); if (f && b.dataset.v === 'liste') window.scrollTo(0, 0); }
@@ -977,33 +982,6 @@
     } else if (e.key === 'ArrowRight' && !t.matches('input[type="radio"]')) { goStep(m, posOf(m) + 1); e.preventDefault(); }
     else if (e.key === 'ArrowLeft' && !t.matches('input[type="radio"]')) { goStep(m, posOf(m) - 1); e.preventDefault(); }
     else if (e.key === 'Enter' && t.matches('input[type="radio"]')) { goStep(m, posOf(m) + 1); e.preventDefault(); }
-  }
-
-  /* ---------- Beispieldaten (erfunden) ---------- */
-  function loadDemo() {
-    const s = blank(state.ui); s.demo = true; const a = s.answers;
-    const pick = (arr, i) => arr[i % arr.length];
-    a.person = { name: 'Beispielperson', geburt: 1991, geschlecht: 'weiblich', versicherung: 'Gesetzlich (GKV)', taetigkeit: 'Projektkoordinatorin', anlass: 'Mein Sohn wurde letztes Jahr diagnostiziert, ich erkenne mich in vielem wieder.', ausloeser: ['Eigenes Kind oder Verwandte mit ADHS-Diagnose', 'Probleme in Beruf/Studium'], beschwerden: '1. Ich verpasse Fristen, obwohl ich sie kenne. 2. Ich verliere ständig Schlüssel und Unterlagen. 3. Ich bin abends innerlich so unruhig, dass ich nicht einschlafen kann.', seit: 'Schon immer / seit der Kindheit', leidensdruck: 7, eltern: 'Ja, ein Elternteil', partner: 'Ja' };
-    a.asrs = {}; ASRS_ITEMS.forEach((it, i) => { a.asrs[it.id] = pick([3, 3, 4, 3, 2, 2, 3, 4, 3, 4, 3, 1, 3, 3, 2, 2, 2, 2], i); });
-    a['dsm-aktuell'] = { beginn: 'Vor dem 12. Lebensjahr', dauer: 'Ja', bereiche: ['Beruf / Ausbildung / Studium', 'Partnerschaft / Familie', 'Haushalt / Alltagsorganisation'], beeintr: 'Deutlich', phasen: 'Nein, sie sind durchgehend da' };
-    DSM_ITEMS.forEach((it, i) => { a['dsm-aktuell'][it.id] = pick([2, 3, 2, 2, 3, 3, 3, 3, 2, 1, 0, 2, 2, 1, 1, 1, 1, 1], i); });
-    a['dsm-aktuell'].a1e_ex = 'Steuererklärung seit zwei Jahren nicht abgegeben, Mahnung vom Finanzamt.';
-    a['dsm-aktuell'].a1g_ex = 'Schlüsseldienst dreimal in diesem Jahr gerufen.';
-    a['dsm-kindheit'] = {}; DSM_ITEMS.forEach((it, i) => { a['dsm-kindheit'][it.id] = pick([2, 2, 3, 2, 2, 2, 3, 3, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1], i); });
-    a['dsm-kindheit'].a1h_ex = 'Zeugnis Klasse 2: „Sie träumt oft und lässt sich leicht ablenken.“';
-    a['kindheit-skala'] = {}; WURS_ITEMS.forEach((it, i) => { a['kindheit-skala'][it.id] = pick([3, 3, 1, 1, 3, 3, 3, 2, 1, 1, 1, 1, 2, 2, 0, 0, 0, 1, 2, 2, 2, 3, 1, 1, 3], i); });
-    a.emotion = {}; EMO_ITEMS.forEach((it, i) => { a.emotion[it.id] = pick([2, 1, 1, 1, 2, 1, 2, 3, 2, 3, 3, 3, 2, 1, 0, 3, 2], i); });
-    a.alltag = {}; FUNC_ITEMS.forEach((it, i) => { a.alltag[it.id] = pick([2, 3, 1, 1, 2, 2, 1, 2, 1, 0, 2, 3, 2, 2, 1, 1, 0, 0, 3, 3], i); });
-    a['fremd-aktuell'] = { rater: 'Partner', relation: 'Partner/in', kennt: 'Sehr gut' }; DSM_ITEMS.forEach((it, i) => { a['fremd-aktuell'][it.id] = pick([2, 2, 3, 2, 3, 2, 3, 2, 3, 1, 0, 1, 1, 1, 1, 1, 2, 1], i); });
-    a.phq9 = {}; PHQ9_ITEMS.forEach((it, i) => { a.phq9[it.id] = pick([1, 1, 2, 2, 0, 1, 2, 0, 0], i); });
-    a.gad7 = {}; GAD7_ITEMS.forEach((it, i) => { a.gad7[it.id] = pick([1, 1, 1, 2, 1, 1, 0], i); });
-    a.differenzial = {}; MOD.differenzial.sections.forEach((sec) => sec.fields.forEach((f) => { if (f.type === 'yn') a.differenzial[f.id] = 'nein'; }));
-    Object.assign(a.differenzial, { sl2: 'ja', as4: 'unsicher', au1: '2- bis 4-mal im Monat', au2: '1–2 (oder nie)', au3: 'Seltener als einmal im Monat', can: 'Nie', drog: 'Nie', nik: 'Nein', koff: 5 });
-    a.anamnese = { ss: ['Keine bekannt'], quelle: 'Eltern/Verwandte befragt', schulform: 'Grundschule, Realschule, Fachabitur', wiederholt: 'keine', zeugnis: '„träumt viel“, „könnte mehr leisten“', ausb: 'Studium BWL abgebrochen, Ausbildung Kauffrau für Büromanagement', jobs: 5, stand: 'Verheiratet', kinder: '1 Sohn (9), ADHS diagnostiziert', diag: 'Depressive Episode 2019', suizid: 'Nein', vorerk: 'keine', medis: 'keine', herz: ['Nichts davon'], fam_adhs: ['Eigene Kinder', 'Vater'] };
-    a.unterlagen = { egk: 'vorhanden', gszeug: 'vorhanden', uheft: 'angefragt', labor: 'angefragt', fb_partner: 'vorhanden' };
-    a.arztfragen = { q_diag: ['Wie viele Termine sind geplant und wie lange dauert die Diagnostik insgesamt?'], q_beh: ['Welche Medikamente kommen in Frage, welche Nebenwirkungen gibt es?'] };
-    s.praxen = [{ name: 'Beispiel: Psychiatrische Institutsambulanz', datum: '2026-10-02', status: 'Warteliste', notiz: 'ca. 5 Monate' }];
-    state = s; save();
   }
 
   /* ---------- Start ---------- */
