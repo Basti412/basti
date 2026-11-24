@@ -192,6 +192,165 @@
     gering: { h: 'Wenige ADHS-typische Merkmale', d: 'Ihre Angaben erfüllen die Kernkriterien in der Selbsteinschätzung nicht. Wenn Sie trotzdem stark belastet sind, lohnt sich eine Abklärung – die Ursache kann eine andere sein, die ebenfalls gut behandelbar ist.' }
   };
 
+  /* ---------- Einzelauswertung je Fragebogen ---------- */
+  const EVAL_GROUPS = [
+    { title: 'ADHS-Merkmale (Selbstbeurteilung)', ids: ['asrs', 'dsm-aktuell', 'dsm-kindheit', 'kindheit-skala', 'emotion', 'alltag'] },
+    { title: 'Sicht von außen (Fremdbeurteilung)', ids: ['fremd-aktuell', 'fremd-kindheit'] },
+    { title: 'Abgrenzung zu anderen Ursachen', ids: ['phq9', 'gad7', 'differenzial'] }
+  ];
+  const EVAL_IDS = EVAL_GROUPS.flatMap((g) => g.ids);
+  const TAGS = {
+    adhs: ['Kaum ADHS-typisch', 'Teilweise ADHS-typisch', 'Deutlich ADHS-typisch'],
+    screen: ['Screening unauffällig', 'Grenzbereich', 'Screening positiv'],
+    impair: ['Kaum beeinträchtigt', '1 Bereich beeinträchtigt', 'Mehrere Bereiche beeinträchtigt'],
+    diff: ['Keine Hinweise', 'Einzelne Hinweise', 'Mehrere Hinweise'],
+    emo: ['Kaum ausgeprägt', 'Teilweise ausgeprägt', 'Deutlich ausgeprägt']
+  };
+  const LV = ['gering', 'mittel', 'hoch'];
+  const lvIdx = (v, c) => (v >= c[1] ? 2 : v >= c[0] ? 1 : 0);
+  const num = (x) => (Number.isInteger(x) ? String(x) : dec(x));
+
+  function evalModule(id, r) {
+    r = r || compute();
+    const m = MOD[id]; const p = progress(m);
+    const e = { id, title: m.title, done: complete(m), started: p.done > 0, p, details: [] };
+    if (!e.done) return e;
+    const dsm = (c, cuts, child) => {
+      e.kind = 'adhs'; e.value = Math.max(c.ia, c.hi); e.max = 9; e.cuts = cuts;
+      e.unit = 'von 9 Merkmalen im stärksten Bereich';
+      e.legend = `unauffällig 0–${cuts[0] - 1} · Grenzbereich ${cuts[0]}–${cuts[1] - 1} · auffällig ab ${cuts[1]}`;
+      e.details.push(`Unaufmerksamkeit: ${c.ia} von 9 deutlich ausgeprägt`, `Hyperaktivität/Impulsivität: ${c.hi} von 9 deutlich ausgeprägt`);
+      const i = lvIdx(e.value, cuts);
+      e.text = [
+        `Weniger als ${cuts[0]} Merkmale sind in einem Bereich deutlich ausgeprägt. Das spricht eher gegen ein ${child ? 'ADHS-typisches Bild in der Kindheit' : 'ADHS-typisches Bild'}.`,
+        `${e.value} Merkmale liegen unterhalb der Schwelle von ${cuts[1]}. ${child ? 'Für Kriterium B („mehrere Merkmale vor dem 12. Lebensjahr“) kann das bereits ausreichen.' : 'Das ist ein Grenzbereich; im Interview wird genauer nachgefragt.'}`,
+        `Mindestens ${cuts[1]} von 9 Merkmalen in einem Bereich sind deutlich ausgeprägt. ${child ? 'Das entspricht der Schwelle für Kinder.' : 'Damit ist Kriterium A in der Selbsteinschätzung erfüllt.'}`
+      ][i];
+      if (c.ia >= cuts[1] && c.hi >= cuts[1]) e.details.push('Muster: gemischt (beide Bereiche)');
+      else if (c.ia >= cuts[1]) e.details.push('Muster: vorwiegend unaufmerksam');
+      else if (c.hi >= cuts[1]) e.details.push('Muster: vorwiegend hyperaktiv-impulsiv');
+      return i;
+    };
+    let i = 0;
+    switch (id) {
+      case 'asrs': {
+        e.kind = 'screen'; e.value = r.asrs.partA; e.max = 6; e.cuts = [3, 4];
+        e.unit = 'auffällige Antworten in Teil A'; e.legend = 'unauffällig 0–2 · Grenzbereich 3 · positiv ab 4';
+        i = lvIdx(e.value, e.cuts); if (i === 0 && r.asrs.shaded >= 9) i = 1;
+        e.details.push(`Alle 18 Fragen: ${r.asrs.shaded} im auffälligen Bereich`, `Summenwert: ${r.asrs.sum} von 72`);
+        e.text = ['Das Screening ist unauffällig. Ein Screening kann ADHS aber nicht sicher ausschließen.',
+          'Das Screening liegt knapp unter der Schwelle. Eine genauere Abklärung kann trotzdem sinnvoll sein.',
+          'Das Screening ist positiv: 4 oder mehr Antworten in Teil A liegen im auffälligen Bereich. Eine ausführliche Diagnostik ist sinnvoll.'][i];
+        break;
+      }
+      case 'dsm-aktuell': i = dsm(r.adult, [3, 5], false); break;
+      case 'dsm-kindheit': i = dsm(r.child, [3, 6], true); break;
+      case 'fremd-aktuell': case 'fremd-kindheit': {
+        const adult = id === 'fremd-aktuell'; const c = adult ? r.fremdA : r.fremdK; const self = adult ? r.adult : r.child;
+        i = dsm(c, adult ? [3, 5] : [3, 6], !adult);
+        e.title += ` (${val(id, 'relation') || 'Bezugsperson'})`;
+        e.text = e.text.replace('Damit ist Kriterium A in der Selbsteinschätzung erfüllt.', 'Die Bezugsperson beschreibt damit ein ADHS-typisches Bild.');
+        if (self.done) {
+          const agree = DSM_ITEMS.filter((it) => (Number(val(id, it.id)) >= 2) === (Number(val(adult ? 'dsm-aktuell' : 'dsm-kindheit', it.id)) >= 2)).length;
+          e.details.push(`Übereinstimmung mit Ihrer Selbsteinschätzung: ${agree} von 18 Merkmalen`);
+        }
+        break;
+      }
+      case 'kindheit-skala':
+        e.kind = 'adhs'; e.value = r.wurs.sum; e.max = 100; e.cuts = [26, 36];
+        e.unit = 'von 100 Punkten'; e.legend = 'unauffällig 0–25 · Grenzbereich 26–35 · auffällig ab 36 (Orientierungswert)';
+        i = lvIdx(e.value, e.cuts);
+        e.text = ['Ihre Erinnerungen an die Kindheit zeigen wenige typische Auffälligkeiten.',
+          'Einige typische Auffälligkeiten aus der Kindheit, aber unter dem Orientierungswert.',
+          'Viele typische Auffälligkeiten aus der Kindheit. Das stützt einen Beginn vor dem 12. Lebensjahr.'][i];
+        e.details.push('Der Orientierungswert ist aus dem WURS-K-Grenzwert umgerechnet und nicht validiert.');
+        break;
+      case 'emotion': {
+        e.kind = 'emo'; e.value = Math.round(r.emo.mean * 10) / 10; e.max = 3; e.cuts = [1, 1.5];
+        e.unit = 'Mittelwert (0 bis 3)'; e.legend = 'gering unter 1,0 · mittel 1,0–1,4 · deutlich ab 1,5';
+        i = lvIdx(e.value, e.cuts);
+        const top = Object.entries(r.emo.groups).sort((a, b) => b[1] - a[1]).slice(0, 2);
+        e.details.push('Am stärksten: ' + top.map(([g, v]) => `${g} (${dec(v)})`).join(', '));
+        e.text = ['Stimmungsschwankungen, Reizbarkeit und Desorganisation sind kaum ausgeprägt.',
+          'Diese Merkmale sind teilweise vorhanden.',
+          'Stimmungsschwankungen, Reizbarkeit, Stressempfindlichkeit oder Desorganisation sind deutlich ausgeprägt. Das ist bei Erwachsenen mit ADHS häufig, kommt aber auch bei anderen Erkrankungen vor.'][i];
+        break;
+      }
+      case 'alltag': {
+        e.kind = 'impair'; e.value = r.func.impaired; e.max = Object.keys(r.func.doms).length; e.cuts = [1, 2];
+        e.unit = `von ${e.max} Lebensbereichen deutlich betroffen`; e.legend = 'kein Bereich · 1 Bereich · ab 2 Bereichen (Kriterium D)';
+        i = lvIdx(e.value, e.cuts);
+        const ds = Object.entries(r.func.doms).filter(([, v]) => v >= 2).map(([d]) => d);
+        if (ds.length) e.details.push('Betroffen: ' + ds.join(', '));
+        e.text = ['In keinem Lebensbereich treten die Schwierigkeiten oft auf.',
+          'Ein Lebensbereich ist deutlich betroffen. Für eine Diagnose müssen die Beschwerden in mindestens zwei Bereichen auftreten.',
+          'Mehrere Lebensbereiche sind deutlich betroffen. Das spricht für eine relevante Beeinträchtigung (Kriterium D).'][i];
+        break;
+      }
+      case 'phq9': case 'gad7': {
+        const isP = id === 'phq9'; const s = isP ? r.phq : r.gad;
+        e.kind = 'other'; e.value = s.sum; e.max = isP ? 27 : 21; e.cuts = [5, 10];
+        e.unit = `von ${e.max} Punkten`; e.legend = 'minimal 0–4 · leicht 5–9 · ab 10 abklärungsbedürftig';
+        i = lvIdx(e.value, e.cuts);
+        e.tag = `${isP ? 'Depressive Symptome' : 'Angstsymptome'}: ${s.label}`;
+        const what = isP ? 'Depression' : 'Angststörung';
+        e.text = [`Kaum Hinweise auf eine ${what}.`,
+          `Leichte Beschwerden. Sie können die Konzentration beeinträchtigen; bitte im Termin erwähnen.`,
+          `Ab 10 Punkten sollte eine ${what} ärztlich abgeklärt werden. Sie kann ADHS-ähnliche Beschwerden verursachen oder zusätzlich bestehen.`][i];
+        if (isP && r.phq.item9 > 0) e.details.push('Frage 9 (Gedanken an Tod oder Selbstverletzung) wurde nicht mit „überhaupt nicht“ beantwortet. Bitte unbedingt ansprechen.');
+        break;
+      }
+      case 'differenzial': {
+        const fl = r.flags.filter((f) => !/PHQ-9|GAD-7|Herz-Kreislauf/.test(f.t));
+        e.kind = 'diff'; e.value = fl.length; e.max = Math.max(6, fl.length); e.cuts = [1, 3];
+        e.unit = 'Bereiche mit Hinweisen'; e.legend = 'keine · 1–2 · ab 3';
+        i = lvIdx(e.value, e.cuts);
+        fl.forEach((f) => e.details.push(f.t));
+        e.text = ['Aus den Abgrenzungsfragen ergeben sich keine besonderen Hinweise.',
+          'Einzelne Punkte sollten im Termin besprochen werden. Ein Hinweis ist keine Diagnose.',
+          'Mehrere Punkte sollten im Termin besprochen werden. Sie können ADHS-ähnliche Beschwerden erklären oder zusätzlich bestehen.'][i];
+        break;
+      }
+    }
+    e.level = LV[i];
+    if (!e.tag) e.tag = (TAGS[e.kind] || TAGS.adhs)[i];
+    return e;
+  }
+
+  function evalCard(e, opts = {}) {
+    if (!e.done) {
+      const m = MOD[e.id];
+      const label = e.started ? `${e.p.done} von ${e.p.total} beantwortet` : m.recommended ? 'Nicht ausgefüllt (empfohlen)' : 'Noch nicht begonnen';
+      return `<article class="ev pending"><header class="ev-h"><h3>${esc(e.title)}</h3><span class="ev-tag">offen</span></header><p class="ev-sub">${label}</p><a class="btn small ghost" href="#${e.id}">${e.started ? 'Weiter ausfüllen' : 'Ausfüllen'}</a></article>`;
+    }
+    const pct = (x) => Math.max(0, Math.min(100, (x / e.max) * 100));
+    const segs = [[0, e.cuts[0]], [e.cuts[0], e.cuts[1]], [e.cuts[1], e.max]];
+    const bar = `<div class="ev-bar" role="img" aria-label="${esc(`${num(e.value)} ${e.unit}. Tendenz: ${e.tag}`)}">${segs.map(([a, b], k) => `<span class="seg s${k}" style="flex:${Math.max(0, b - a)}"></span>`).join('')}<i style="left:${pct(e.value)}%"></i></div>`;
+    return `<article class="ev lvl-${e.level} k-${e.kind}${opts.big ? ' big' : ''}">
+      <header class="ev-h"><h3>${esc(e.title)}</h3><span class="ev-tag">${esc(e.tag)}</span></header>
+      <p class="ev-score"><b>${num(e.value)}</b> <span>${esc(e.unit)}</span></p>
+      ${bar}<p class="ev-legend">${esc(e.legend)}</p>
+      <p class="ev-text">${esc(e.text)}</p>
+      ${e.details.length ? `<ul class="ev-det">${e.details.map((d) => `<li>${esc(d)}</li>`).join('')}</ul>` : ''}
+    </article>`;
+  }
+  function evalSection(r) {
+    const evs = EVAL_IDS.map((id) => evalModule(id, r));
+    const done = evs.filter((e) => e.done);
+    const counts = { hoch: 0, mittel: 0, gering: 0 };
+    done.filter((e) => ['adhs', 'screen'].includes(e.kind)).forEach((e) => { counts[e.level]++; });
+    return `<section class="evals" aria-labelledby="ev-h"><h2 id="ev-h">Ergebnisse der einzelnen Fragebögen</h2>
+      <p class="help">Jeder Fragebogen wird für sich eingeordnet, sobald er vollständig ist. Die Gesamteinschätzung oben fasst diese Ergebnisse nach den Diagnosekriterien zusammen. ${done.length} von ${evs.length} Fragebögen sind ausgewertet${done.length ? ` – davon Screening und Symptomskalen ${counts.hoch}× auffällig, ${counts.mittel}× im Grenzbereich, ${counts.gering}× unauffällig` : ''}.</p>
+      <div class="ev-overview" role="list">${evs.map((e) => `<a role="listitem" href="#ev-${e.id}" class="ev-chip ${e.done ? 'lvl-' + e.level + ' k-' + e.kind : 'pending'}"><span>${esc(MOD[e.id].title)}</span><b>${e.done ? esc(e.tag) : 'offen'}</b></a>`).join('')}</div>
+      ${EVAL_GROUPS.map((g) => `<h3 class="ev-gh">${esc(g.title)}</h3><div class="ev-grid">${g.ids.map((id) => `<div id="ev-${id}">${evalCard(evs.find((e) => e.id === id))}</div>`).join('')}</div>`).join('')}
+    </section>`;
+  }
+  function resultSlot(m) {
+    if (!EVAL_IDS.includes(m.id)) return '';
+    return `<div class="result-slot" id="result-slot" data-mod="${m.id}">${complete(m) ? resultInner(m) : ''}</div>`;
+  }
+  function resultInner(m) { return `<p class="eyebrow">Ihr Ergebnis</p>${evalCard(evalModule(m.id), { big: true })}<p class="help">Eine Einordnung Ihrer Angaben, keine Diagnose. Alle Ergebnisse finden Sie unter <a href="#auswertung">Auswertung &amp; Bericht</a>.</p>`; }
+
   /* ---------- Rendering: Felder ---------- */
   function fieldHtml(mid, f) {
     const v = val(mid, f.id);
@@ -321,6 +480,7 @@
     const nxt = nextModule(m.id);
     if (open) return `<div class="f-card f-end"><h2 class="f-q">Fast geschafft</h2><p>${open === 1 ? 'Eine Frage ist' : `${open} Fragen sind`} noch offen. Sie können sie jetzt oder später beantworten.</p><div class="row"><button class="btn primary" data-act="f-open">Zur ersten offenen Frage</button>${nxt ? `<a class="btn ghost" href="#${nxt.id}">Erst mit „${esc(nxt.title)}“ weitermachen</a>` : ''}</div></div>`;
     return `<div class="f-card f-end is-ok"><div class="f-check" aria-hidden="true">✓</div><h2 class="f-q">Geschafft: ${esc(m.title)}</h2><p>Alle Antworten sind gespeichert.${nxt ? ` Als Nächstes: <b>${esc(nxt.title)}</b> (${restLabel(nxt, minutesLeft(nxt))}).` : ''}</p>
+      ${EVAL_IDS.includes(m.id) ? `<div class="f-result">${resultInner(m)}</div>` : ''}
       <div class="row">${nxt ? `<a class="btn primary" href="#${nxt.id}">Weiter zu „${esc(nxt.title)}“</a>` : ''}<a class="btn ghost" href="#start">Zur Übersicht</a><button class="btn ghost" data-act="mode" data-v="liste">Antworten prüfen</button></div></div>`;
   }
   function nextModule(fromId) {
@@ -350,7 +510,7 @@
   }
 
   function viewForm(m) {
-    return header(m) + m.sections.map((s) => `<section class="card"><h2>${esc(s.title)}</h2><div class="fields">${s.fields.map((f) => fieldHtml(m.id, f)).join('')}</div></section>`).join('') + navFooter(m);
+    return header(m) + m.sections.map((s) => `<section class="card"><h2>${esc(s.title)}</h2><div class="fields">${s.fields.map((f) => fieldHtml(m.id, f)).join('')}</div></section>`).join('') + resultSlot(m) + navFooter(m);
   }
   function viewScale(m) {
     let html = header(m) + '<div class="items">';
@@ -361,7 +521,7 @@
     });
     html += '</div>';
     if (m.id === 'phq9') html += crisisBox(true);
-    return html + navFooter(m);
+    return html + resultSlot(m) + navFooter(m);
   }
   function viewDsm(m) {
     const adult = m.which === 'adult';
@@ -373,7 +533,7 @@
     });
     html += '</div>';
     if (m.extra) html += `<section class="card"><h2>Zusatzkriterien B bis E</h2><div class="fields">${m.extra.map((f) => fieldHtml(m.id, f)).join('')}</div></section>`;
-    return html + navFooter(m);
+    return html + resultSlot(m) + navFooter(m);
   }
   function viewFremd(m) {
     const adult = m.which === 'adult';
@@ -387,7 +547,7 @@
     });
     html += '</div>';
     html += `<section class="card"><div class="fields">${fieldHtml(m.id, { id: 'kommentar', label: 'Was möchten Sie der Ärztin/dem Arzt sonst noch mitteilen?', type: 'textarea' })}</div></section>`;
-    return html + navFooter(m);
+    return html + resultSlot(m) + navFooter(m);
   }
   const STATUS = ['offen', 'angefragt', 'vorhanden', 'nicht verfügbar', 'nicht nötig'];
   function viewChecklist(m) {
@@ -502,7 +662,7 @@
     const ready = missing.length === 0;
     const rec = ready ? recommend(r) : null;
     let html = `<header class="mod-head"><p class="eyebrow">Ergebnis</p><h1>Auswertung &amp; Bericht</h1>
-      <p class="intro">Oben steht die unverbindliche Einschätzung. Darunter folgt der Bericht für Ihre Ärztin oder Ihren Arzt mit allen Ergebnissen, Ihren Beispielen und Ihrer Lebensgeschichte.</p></header>`;
+      <p class="intro">Oben steht die unverbindliche Gesamteinschätzung, danach die Tendenz jedes einzelnen Fragebogens. Darunter folgt der Bericht für Ihre Ärztin oder Ihren Arzt mit allen Ergebnissen, Ihren Beispielen und Ihrer Lebensgeschichte.</p></header>`;
     if (state.demo) html += '<aside class="demo-banner">Beispieldaten: Diese Auswertung beruht auf erfundenen Angaben.</aside>';
     if (!ready) {
       html += `<section class="card gate"><h2>Noch ${missing.length} Pflichtmodul${missing.length > 1 ? 'e' : ''} offen</h2>
@@ -521,6 +681,7 @@
         <p class="disclaimer">Diese Einschätzung ist keine Diagnose und nicht validiert. Sie fasst nur Ihre eigenen Angaben nach den Diagnosekriterien zusammen. Viele Merkmale kommen auch bei Menschen ohne ADHS vor. Umgekehrt schließt ein niedriges Ergebnis ADHS nicht sicher aus.</p></section>`;
     }
     if (r.phq.item9 > 0) html += crisisBox(false);
+    html += evalSection(r);
 
     // Werkzeuge
     html += `<section class="card tools no-print"><h2>Bericht</h2>
@@ -540,24 +701,25 @@
     const t = (v) => (filled(v) ? esc(Array.isArray(v) ? v.join(', ') : v) : '<span class="muted">–</span>');
     const row = (k, v) => `<tr><th scope="row">${esc(k)}</th><td>${v}</td></tr>`;
     const st = (done) => (done ? '' : ' <span class="muted">(unvollständig)</span>');
+    const tg = (id) => { const e = evalModule(id, r); return e.done ? `<span class="rtag lvl-${e.level} k-${e.kind}">${esc(e.tag)}</span>` : '<span class="muted">–</span>'; };
     let h = `<header class="rep-head"><h2>Vorbereitungsbericht ADHS-Diagnostik (Erwachsene)</h2><p class="muted">Selbstauskunft, erstellt am ${new Date().toLocaleDateString('de-DE')}${state.demo ? ' · BEISPIELDATEN' : ''}</p></header>`;
     h += `<h3>1. Person und Anliegen</h3><div class="tbl-wrap"><table class="tbl kv"><tbody>
       ${row('Name', t(p.name))}${row('Geburtsjahr', t(p.geburt))}${row('Geschlecht', t(p.geschlecht))}${row('Versicherung', t(p.versicherung))}${row('Tätigkeit', t(p.taetigkeit))}${row('Hausarztpraxis', t(p.hausarzt))}
       ${row('Anlass', t(p.anlass))}${row('Auslöser des Verdachts', t(p.ausloeser))}${row('Hauptbeschwerden', t(p.beschwerden))}${row('Beschwerden seit', t(p.seit))}${row('Leidensdruck (0–10)', t(p.leidensdruck))}${row('Ziele', t(p.ziele))}
       ${row('Fremdauskunft Kindheit möglich', t(p.eltern))}${row('Fremdauskunft heute möglich', t(p.partner))}</tbody></table></div>`;
 
-    h += `<h3>2. Ergebnisse der Fragebögen</h3><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Bereich</th><th>Ergebnis</th><th>Orientierung</th></tr></thead><tbody>
-      <tr><td>Screening (ASRS-Typ)${st(r.asrs.done)}</td><td>Teil A: ${r.asrs.partA}/6 auffällig · gesamt ${r.asrs.shaded}/18 auffällig · Summe ${r.asrs.sum}/72</td><td>Teil A ab 4 auffälligen Antworten positiv</td></tr>
-      <tr><td>Symptomcheckliste heute${st(r.adult.done)}</td><td>Unaufmerksamkeit ${r.adult.ia}/9 · Hyperaktivität/Impulsivität ${r.adult.hi}/9</td><td>Erwachsene: ≥ 5 in einem Bereich (Stufe „deutlich“ oder „stark“)</td></tr>
-      <tr><td>Symptomcheckliste Kindheit${st(r.child.done)}</td><td>Unaufmerksamkeit ${r.child.ia}/9 · Hyperaktivität/Impulsivität ${r.child.hi}/9</td><td>Kinder: ≥ 6 in einem Bereich; Kriterium B: „mehrere“ vor 12 J.</td></tr>
-      <tr><td>Kindheitsskala (WURS-Typ)${st(r.wurs.done)}</td><td>${r.wurs.sum}/100</td><td>Orientierungswert ≥ 36 (aus WURS-K-Grenzwert umgerechnet, nicht validiert)</td></tr>
-      <tr><td>Emotionen &amp; Organisation${st(r.emo.done)}</td><td>Mittelwert ${dec(r.emo.mean)}/3 · ${Object.entries(r.emo.groups).map(([g, v]) => `${esc(g)} ${dec(v)}`).join(' · ')}</td><td>Kein Grenzwert; ab 1,5 deutlich ausgeprägt</td></tr>
-      <tr><td>Beeinträchtigung im Alltag${st(r.func.done)}</td><td>${r.func.impaired} Bereiche mit „oft“ oder häufiger: ${Object.entries(r.func.doms).filter(([, v]) => v >= 2).map(([d]) => esc(d)).join(', ') || 'keine'}</td><td>≥ 2 Bereiche spricht für Kriterium D</td></tr>
-      <tr><td>Fremdbeurteilung heute${r.fremdA.done ? ` (${esc(val('fremd-aktuell', 'relation'))})` : ''}</td><td>${r.fremdA.done ? `Unaufmerksamkeit ${r.fremdA.ia}/9 · Hyperaktivität/Impulsivität ${r.fremdA.hi}/9` : '<span class="muted">nicht vorliegend</span>'}</td><td>≥ 5 in einem Bereich</td></tr>
-      <tr><td>Fremdbeurteilung Kindheit${r.fremdK.done ? ` (${esc(val('fremd-kindheit', 'relation'))})` : ''}</td><td>${r.fremdK.done ? `Unaufmerksamkeit ${r.fremdK.ia}/9 · Hyperaktivität/Impulsivität ${r.fremdK.hi}/9` : '<span class="muted">nicht vorliegend</span>'}</td><td>≥ 6 in einem Bereich</td></tr>
-      <tr><td>PHQ-9 (Depression)${st(r.phq.done)}</td><td>${r.phq.sum}/27 – ${r.phq.label}${r.phq.item9 > 0 ? ' · <b>Frage 9 positiv</b>' : ''}</td><td>5 / 10 / 15 / 20 = leicht / mittelgradig / mittelschwer / schwer</td></tr>
-      <tr><td>GAD-7 (Angst)${st(r.gad.done)}</td><td>${r.gad.sum}/21 – ${r.gad.label}</td><td>5 / 10 / 15 = leicht / mittelgradig / schwer</td></tr>
-      <tr><td>AUDIT-C (Alkohol)</td><td>${r.audit.sum}/12</td><td>Auffällig ab ${r.audit.cut} (S3-Leitlinie Alkohol: Frauen ≥ 4, Männer ≥ 5)</td></tr>
+    h += `<h3>2. Ergebnisse der Fragebögen</h3><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Bereich</th><th>Ergebnis</th><th>Orientierung</th><th>Einordnung</th></tr></thead><tbody>
+      <tr><td>Screening (ASRS-Typ)${st(r.asrs.done)}</td><td>Teil A: ${r.asrs.partA}/6 auffällig · gesamt ${r.asrs.shaded}/18 auffällig · Summe ${r.asrs.sum}/72</td><td>Teil A ab 4 auffälligen Antworten positiv</td><td>${tg('asrs')}</td></tr>
+      <tr><td>Symptomcheckliste heute${st(r.adult.done)}</td><td>Unaufmerksamkeit ${r.adult.ia}/9 · Hyperaktivität/Impulsivität ${r.adult.hi}/9</td><td>Erwachsene: ≥ 5 in einem Bereich (Stufe „deutlich“ oder „stark“)</td><td>${tg('dsm-aktuell')}</td></tr>
+      <tr><td>Symptomcheckliste Kindheit${st(r.child.done)}</td><td>Unaufmerksamkeit ${r.child.ia}/9 · Hyperaktivität/Impulsivität ${r.child.hi}/9</td><td>Kinder: ≥ 6 in einem Bereich; Kriterium B: „mehrere“ vor 12 J.</td><td>${tg('dsm-kindheit')}</td></tr>
+      <tr><td>Kindheitsskala (WURS-Typ)${st(r.wurs.done)}</td><td>${r.wurs.sum}/100</td><td>Orientierungswert ≥ 36 (aus WURS-K-Grenzwert umgerechnet, nicht validiert)</td><td>${tg('kindheit-skala')}</td></tr>
+      <tr><td>Emotionen &amp; Organisation${st(r.emo.done)}</td><td>Mittelwert ${dec(r.emo.mean)}/3 · ${Object.entries(r.emo.groups).map(([g, v]) => `${esc(g)} ${dec(v)}`).join(' · ')}</td><td>Kein Grenzwert; ab 1,5 deutlich ausgeprägt</td><td>${tg('emotion')}</td></tr>
+      <tr><td>Beeinträchtigung im Alltag${st(r.func.done)}</td><td>${r.func.impaired} Bereiche mit „oft“ oder häufiger: ${Object.entries(r.func.doms).filter(([, v]) => v >= 2).map(([d]) => esc(d)).join(', ') || 'keine'}</td><td>≥ 2 Bereiche spricht für Kriterium D</td><td>${tg('alltag')}</td></tr>
+      <tr><td>Fremdbeurteilung heute${r.fremdA.done ? ` (${esc(val('fremd-aktuell', 'relation'))})` : ''}</td><td>${r.fremdA.done ? `Unaufmerksamkeit ${r.fremdA.ia}/9 · Hyperaktivität/Impulsivität ${r.fremdA.hi}/9` : '<span class="muted">nicht vorliegend</span>'}</td><td>≥ 5 in einem Bereich</td><td>${tg('fremd-aktuell')}</td></tr>
+      <tr><td>Fremdbeurteilung Kindheit${r.fremdK.done ? ` (${esc(val('fremd-kindheit', 'relation'))})` : ''}</td><td>${r.fremdK.done ? `Unaufmerksamkeit ${r.fremdK.ia}/9 · Hyperaktivität/Impulsivität ${r.fremdK.hi}/9` : '<span class="muted">nicht vorliegend</span>'}</td><td>≥ 6 in einem Bereich</td><td>${tg('fremd-kindheit')}</td></tr>
+      <tr><td>PHQ-9 (Depression)${st(r.phq.done)}</td><td>${r.phq.sum}/27 – ${r.phq.label}${r.phq.item9 > 0 ? ' · <b>Frage 9 positiv</b>' : ''}</td><td>5 / 10 / 15 / 20 = leicht / mittelgradig / mittelschwer / schwer</td><td>${tg('phq9')}</td></tr>
+      <tr><td>GAD-7 (Angst)${st(r.gad.done)}</td><td>${r.gad.sum}/21 – ${r.gad.label}</td><td>5 / 10 / 15 = leicht / mittelgradig / schwer</td><td>${tg('gad7')}</td></tr>
+      <tr><td>AUDIT-C (Alkohol)</td><td>${r.audit.sum}/12</td><td>Auffällig ab ${r.audit.cut} (S3-Leitlinie Alkohol: Frauen ≥ 4, Männer ≥ 5)</td><td>${r.audit.pos ? '<b>auffällig</b>' : 'unauffällig'}</td></tr>
     </tbody></table></div>`;
 
     h += `<h3>3. Zusatzkriterien</h3><div class="tbl-wrap"><table class="tbl kv"><tbody>
@@ -673,6 +835,8 @@
       const nxt = nextModule(mid);
       if (!isFocus(m)) toast(`<b>Geschafft: ${esc(m.title)}</b>${nxt ? ` · Als Nächstes: <a href="#${nxt.id}">${esc(nxt.title)}</a>` : ''}`);
     }
+    const slot = $('#result-slot');
+    if (slot && slot.dataset.mod === mid) slot.innerHTML = c ? resultInner(m) : '';
     doneBefore[mid] = c;
     updateTopProgress();
   }

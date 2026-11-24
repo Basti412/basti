@@ -41,6 +41,22 @@ Die Oberfläche folgt Empfehlungen für kognitive Barrierefreiheit (W3C, „Maki
 - **Stufen:** *deutlich* (A + Kindheit + C + D erfüllt, nicht nur phasenweise), *teilweise* (A erfüllt/grenzwertig oder Screening positiv), sonst *gering*.
 - Hinweise zur Abgrenzung (PHQ-9 ≥ 10, GAD-7 ≥ 10, AUDIT-C, Hypomanie, Autismus usw.) werden gesondert ausgewiesen.
 
+## Einzelauswertung je Fragebogen
+Jeder Fragebogen wird ausgewertet, sobald er vollständig ist: direkt nach dem Abschluss („Ihr Ergebnis“), unten in der Listenansicht, gesammelt unter „Auswertung & Bericht“ und als Spalte „Einordnung“ im Arztbericht. Jede Karte zeigt den Wert, eine Skala mit drei Bereichen, die Tendenz und eine kurze Erklärung.
+
+| Fragebogen | Wert | unauffällig | Grenzbereich | auffällig |
+|---|---|---|---|---|
+| Screening (ASRS-Typ) | auffällige Antworten Teil A (0–6) | 0–2 | 3 (oder ≥ 9 von 18 gesamt) | ≥ 4 |
+| Symptomcheckliste heute / Fremd heute | Merkmale im stärkeren Bereich (0–9) | 0–2 | 3–4 | ≥ 5 |
+| Symptomcheckliste Kindheit / Fremd Kindheit | Merkmale im stärkeren Bereich (0–9) | 0–2 | 3–5 | ≥ 6 |
+| Kindheitsskala (WURS-Typ) | Summe (0–100) | 0–25 | 26–35 | ≥ 36 |
+| Emotionen & Organisation | Mittelwert (0–3) | < 1,0 | 1,0–1,4 | ≥ 1,5 |
+| Beeinträchtigung im Alltag | Bereiche mit „oft“ oder häufiger | 0 | 1 | ≥ 2 |
+| PHQ-9 / GAD-7 | Summe | 0–4 | 5–9 | ≥ 10 |
+| Weitere Abklärung | Bereiche mit Hinweisen | 0 | 1–2 | ≥ 3 |
+
+Die Grenzbereiche (ausgenommen ASRS Teil A, DSM-5-Schwellen, PHQ-9/GAD-7) sind eigene Festlegungen zur Orientierung und nicht validiert. Fremdbeurteilungen zeigen zusätzlich die Übereinstimmung mit der Selbsteinschätzung (von 18 Merkmalen).
+
 ## Wichtige Hinweise
 - Die App stellt **keine Diagnose** und ist **nicht validiert**.
 - Geschützte Instrumente (ASRS, WURS-K, ADHS-SB/HASE, DIVA-5, CAARS, WRI, WFIRS) sind **nicht im Original** enthalten. Die App bildet ihre Inhalte mit eigenen Formulierungen ab. Wörtlich übernommen sind nur die frei verwendbaren Bögen PHQ-9, GAD-7 und AUDIT-C.
