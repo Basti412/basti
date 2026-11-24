@@ -627,7 +627,7 @@
     const restReq = requiredMods().filter((m) => !complete(m)).reduce((t, m) => t + minutesLeft(m), 0);
     const np = progress(nxt);
     const started = allProg.d > 0;
-    return `<header class="hero"><p class="eyebrow">Vorbereitung auf die Facharzt-Diagnostik</p>
+    return `<header class="hero"><div class="hero-top"><p class="eyebrow">Vorbereitung auf die Facharzt-Diagnostik</p><span class="hero-brand">made by <b>${BRAND}</b></span></div>
       <h1 class="hero-name">Kopf sortiert<span class="dot">.</span></h1>
       <p class="hero-tag">Dein ADHS-Lotse</p>
       <p class="intro">Fragebögen, Checklisten und Unterlagen für die ADHS-Diagnostik – in kleinen Etappen. Am Ende steht ein Bericht für deine Ärztin oder deinen Arzt.</p>

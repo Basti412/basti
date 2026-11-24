@@ -461,6 +461,12 @@ body.calm *, body.calm *::before { animation: none !important; transition: none 
 .rep-credit { margin-top: 18px !important; padding-top: 10px; border-top: 1px solid var(--line); font-size: .8rem; color: var(--muted); text-align: center; }
 @media print { .site-foot { display: none; } }
 
+
+/* Branding oben auf der Startseite */
+.hero-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; }
+.hero-brand { display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px; border-radius: 99px; background: color-mix(in srgb, var(--surface) 75%, transparent); border: 1px solid var(--line); font-size: .8rem; color: var(--muted); white-space: nowrap; }
+.hero-brand b { color: var(--ink); font-weight: 700; }
+
 /* Mobil */
 @media (max-width: 860px) {
   .layout { grid-template-columns: minmax(0, 1fr); }
@@ -503,3 +509,4 @@ body.calm *, body.calm *::before { animation: none !important; transition: none 
 }
 
 .pane-sec.danger-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+@media (max-width: 560px) { .hero-brand { order: -1; } }
