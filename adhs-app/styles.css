@@ -79,7 +79,7 @@ a { color: var(--accent); }
 .layout { display: grid; grid-template-columns: var(--nav-w) minmax(0, 1fr); }
 .nav {
   position: sticky; top: calc(56px + env(safe-area-inset-top, 0px)); align-self: start;
-  height: calc(100vh - 56px - env(safe-area-inset-top, 0px)); overflow-y: auto;
+  height: calc(100vh - 56px - env(safe-area-inset-top, 0px)); height: calc(100dvh - 56px - env(safe-area-inset-top, 0px)); overflow-y: auto; overscroll-behavior: contain;
   padding: 20px 12px 40px max(12px, env(safe-area-inset-left, 0px)); border-right: 1px solid var(--line); background: var(--surface);
 }
 .ngroup { display: grid; gap: 2px; margin-bottom: 14px; }
@@ -333,7 +333,7 @@ kbd { font-family: var(--f-body); font-size: .78rem; font-weight: 700; min-width
 
 /* Einstellungen & Hinweise */
 .set-btn { white-space: nowrap; }
-.settings { position: fixed; z-index: 40; top: calc(64px + env(safe-area-inset-top, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); width: min(380px, calc(100vw - 24px)); max-height: calc(100vh - 90px); overflow-y: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; display: grid; gap: 12px; box-shadow: 0 16px 40px rgba(0,0,0,.18); }
+.settings { position: fixed; z-index: 40; top: calc(64px + env(safe-area-inset-top, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); width: min(380px, calc(100vw - 24px)); max-height: calc(100vh - 90px); max-height: calc(100dvh - 90px); overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; display: grid; gap: 12px; box-shadow: 0 16px 40px rgba(0,0,0,.18); }
 .settings[hidden] { display: none; }
 .settings fieldset { border: 0; margin: 0; padding: 0; display: grid; gap: 8px; }
 .settings legend { font-weight: 700; margin-bottom: 6px; }
@@ -429,12 +429,24 @@ body.calm *, body.calm *::before { animation: none !important; transition: none 
 [id^="ev-"] { scroll-margin-top: 80px; }
 @media print { .ev-overview { display: none; } .ev { break-inside: avoid; } }
 
+
+/* Abdeckung hinter geöffneten Menüs: Tippen schließt (cursor: pointer, damit iOS den Tipp meldet) */
+.backdrop { position: fixed; inset: 0; z-index: 12; background: transparent; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.backdrop[hidden] { display: none; }
+.set-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.set-top h2 { font-size: 1.1rem; }
+.set-x { width: 44px; height: 44px; font-size: 1.15rem; border-radius: 8px; }
+.set-x:hover { background: var(--sunk); }
+
 /* Mobil */
 @media (max-width: 860px) {
   .layout { grid-template-columns: minmax(0, 1fr); }
   .menu-btn { display: inline-grid; place-items: center; }
-  .nav { position: fixed; z-index: 25; top: calc(56px + env(safe-area-inset-top, 0px)); left: 0; bottom: 0; width: min(320px, 86vw); height: auto; transform: translateX(-105%); transition: transform .2s; box-shadow: 0 10px 30px rgba(0,0,0,.2); }
-  body.nav-open .nav { transform: none; }
+  /* Menüs liegen oben auf der Seite und scrollen mit ihr – keine eigene Scrollfläche (iOS Safari) */
+  .nav { position: absolute; z-index: 15; top: calc(56px + env(safe-area-inset-top, 0px)); left: 0; bottom: auto; width: min(320px, 86vw); height: auto; min-height: 70vh; overflow: visible; padding-bottom: calc(48px + env(safe-area-inset-bottom, 0px)); border-radius: 0 0 14px 0; transform: translateX(-105%); visibility: hidden; transition: transform .2s, visibility 0s .2s; box-shadow: 0 10px 30px rgba(0,0,0,.2); }
+  body.nav-open .nav { transform: none; visibility: visible; transition: transform .2s; }
+  .settings { position: absolute; z-index: 16; top: calc(64px + env(safe-area-inset-top, 0px)); left: max(12px, env(safe-area-inset-left, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); width: auto; max-height: none; overflow: visible; margin-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
+  .backdrop { background: rgba(10, 20, 25, .45); }
   .brand > span:last-child { display: none; }
   .mobile-title { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; font-size: .95rem; }
   .save-state { display: none; }
@@ -466,3 +478,5 @@ body.calm *, body.calm *::before { animation: none !important; transition: none 
   .tbl tr { break-inside: avoid; }
   .verdict details { display: block; }
 }
+
+.pane-sec.danger-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }

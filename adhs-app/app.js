@@ -793,7 +793,7 @@
     const views = { dashboard: viewDashboard, ablauf: () => viewAblauf(m), form: () => viewForm(m), scale: () => viewScale(m), dsm: () => viewDsm(m), fremd: () => viewFremd(m), checklist: () => viewChecklist(m), report: viewReport };
     $('#main').innerHTML = isFocus(m) ? viewFocus(m) : views[m.type]();
     $('#mobile-title').textContent = m.title;
-    document.body.classList.remove('nav-open');
+    closeNav(false);
     if (m.required || m.recommended) { state.last = id; save(); }
     doneBefore[id] = complete(m);
     applyUi();
@@ -931,7 +931,8 @@
     }
     if (act === 'reset-no') $('#reset-confirm').innerHTML = '';
     if (act === 'reset') { state = blank(state.ui); try { localStorage.removeItem(STORE_KEY); } catch (err) { /* */ } render(); showSaveStatus(); msg('Alle Angaben wurden gelöscht.'); }
-    if (act === 'menu') document.body.classList.toggle('nav-open');
+    if (act === 'menu') { if (document.body.classList.contains('nav-open')) closeNav(true); else openNav(); }
+    if (act === 'close-menus') { closeNav(true); closeSettings(); }
     const m = MOD[current()];
     if (act === 'mode') { state.ui.mode = b.dataset.v; save(); render(); const f = $('#focus') || $('.items'); if (f && b.dataset.v === 'liste') window.scrollTo(0, 0); }
     if (act === 'f-prev') goStep(m, posOf(m) - 1);
@@ -944,13 +945,46 @@
     if (act === 'tab') showTab(b.dataset.tab, true);
     if (act === 'resume') { const t = resumeTarget(); location.hash = t.id; }
   }
-  function openSettings(tab) {
-    const p = $('#settings'); p.hidden = false; $('.set-btn').setAttribute('aria-expanded', 'true');
-    applyUi(); showSaveStatus(); showTab(tab || openSettings.last || 'ansicht', true);
+  /* Menüs: Auf dem Handy öffnen sie oben auf der Seite und scrollen mit der Seite
+     (keine eigene Scrollfläche, kein 100vh) – das vermeidet die iOS-Safari-Probleme. */
+  const isSmall = () => matchMedia('(max-width: 860px)').matches;
+  let menuScrollY = null;
+  function menuOpened() {
+    if (menuScrollY === null && isSmall()) { menuScrollY = window.scrollY; window.scrollTo(0, 0); }
+    syncBackdrop();
   }
-  function closeSettings() {
+  function menuClosed(restore) {
+    if (document.body.classList.contains('nav-open') || !$('#settings').hidden) { syncBackdrop(); return; }
+    if (restore && menuScrollY !== null) window.scrollTo(0, menuScrollY);
+    menuScrollY = null; syncBackdrop();
+  }
+  function syncBackdrop() {
+    const open = document.body.classList.contains('nav-open') || !$('#settings').hidden;
+    $('#backdrop').hidden = !open;
+    document.body.classList.toggle('menu-open', open);
+  }
+  function openNav() {
+    if (!$('#settings').hidden) closeSettings(false);
+    document.body.classList.add('nav-open'); $('.menu-btn').setAttribute('aria-expanded', 'true');
+    menuOpened();
+    const a = $('#nav .nlink.active') || $('#nav .nlink'); if (a) a.focus({ preventScroll: true });
+  }
+  function closeNav(restore) {
+    if (!document.body.classList.contains('nav-open')) return;
+    document.body.classList.remove('nav-open'); $('.menu-btn').setAttribute('aria-expanded', 'false');
+    menuClosed(restore);
+  }
+  function openSettings(tab) {
+    closeNav(false);
+    const p = $('#settings'); p.hidden = false; $('.set-btn').setAttribute('aria-expanded', 'true');
+    menuOpened();
+    applyUi(); showSaveStatus(); showTab(tab || openSettings.last || 'ansicht', !isSmall());
+  }
+  function closeSettings(restore = true) {
     const p = $('#settings'); if (p.hidden) return;
-    p.hidden = true; $('.set-btn').setAttribute('aria-expanded', 'false'); $('.set-btn').focus();
+    p.hidden = true; $('.set-btn').setAttribute('aria-expanded', 'false');
+    menuClosed(restore);
+    if (restore) $('.set-btn').focus({ preventScroll: true });
   }
   function showTab(tab, focus) {
     openSettings.last = tab;
@@ -998,10 +1032,11 @@
   document.addEventListener('keydown', onKey);
   window.addEventListener('pagehide', () => { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) { /* */ } });
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { closeSettings(); document.body.classList.remove('nav-open'); }
+    if (e.key === 'Escape') { closeSettings(); closeNav(true); }
     if ((e.key === 'ArrowRight' || e.key === 'ArrowLeft') && e.target.matches('#settings [role="tab"]')) { showTab(e.target.dataset.tab === 'ansicht' ? 'speichern' : 'ansicht', true); e.preventDefault(); }
   });
   document.addEventListener('click', (e) => { const p = $('#settings'); if (p && !p.hidden && !e.target.closest('#settings, [data-act="settings"]')) closeSettings(); });
+  document.addEventListener('click', (e) => { const l = e.target.closest('#nav a'); if (l && l.getAttribute('href') === (location.hash || '#start')) closeNav(false); });
   if (FRAMED) document.querySelectorAll('[data-top-only]').forEach((el) => el.remove());
   showSaveStatus();
   window.addEventListener('hashchange', () => { render(); window.scrollTo(0, 0); try { speechSynthesis.cancel(); } catch (e) { /* */ } });

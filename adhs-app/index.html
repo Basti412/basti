@@ -14,13 +14,14 @@
 <body>
 <a class="skip" href="#main">Zum Inhalt springen</a>
 <div class="topbar">
-  <button class="menu-btn" data-act="menu" aria-label="Menü öffnen" aria-controls="nav">☰</button>
+  <button class="menu-btn" data-act="menu" aria-label="Menü" aria-expanded="false" aria-controls="nav">☰</button>
   <a class="brand" href="#start"><span class="brand-mark" aria-hidden="true"></span><span>Diagnosemappe <b>ADHS</b></span></a>
   <span id="mobile-title" class="mobile-title"></span>
   <div class="top-prog" title="Fortschritt der Pflichtmodule"><div class="tp-bar"><span id="top-prog"></span></div><span id="top-prog-txt" class="tp-txt"></span></div>
   <button class="btn small ghost set-btn" data-act="settings" aria-expanded="false" aria-controls="settings" aria-label="Einstellungen: Ansicht und Speichern"><span class="gear" aria-hidden="true">⚙</span><span class="set-lbl">Einstellungen</span></button>
 </div>
 <section id="settings" class="settings" hidden aria-label="Einstellungen">
+  <div class="set-top"><h2>Einstellungen</h2><button class="icon-btn set-x" data-act="settings-close" aria-label="Einstellungen schließen">✕</button></div>
   <div class="tabs" role="tablist" aria-label="Einstellungen">
     <button role="tab" id="tab-ansicht" aria-controls="pane-ansicht" aria-selected="true" data-act="tab" data-tab="ansicht">Ansicht</button>
     <button role="tab" id="tab-speichern" aria-controls="pane-speichern" aria-selected="false" data-act="tab" data-tab="speichern" tabindex="-1">Speichern</button>
@@ -67,11 +68,12 @@
         <button class="btn small" data-act="import-text">Code laden</button>
         <p class="help">Beim Laden werden die aktuellen Angaben auf diesem Gerät ersetzt.</p>
       </div></details>
-    <div class="pane-sec danger-row"><button class="btn small danger" data-act="reset-ask">Alle Angaben löschen</button><span id="reset-confirm"></span></div>
+    <div class="pane-sec danger-row"><button class="btn danger" data-act="reset-ask">Alle Angaben löschen</button><span id="reset-confirm"></span></div>
     <p class="help tool-msg" role="status"></p>
   </div>
   <button class="btn small done-btn" data-act="settings-close">Fertig</button>
 </section>
+<div id="backdrop" class="backdrop" data-act="close-menus" hidden></div>
 <div id="toast" class="toast" role="status" hidden></div>
 <div class="layout">
   <nav id="nav" class="nav" aria-label="Module"></nav>
