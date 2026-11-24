@@ -917,19 +917,119 @@
     state = Object.assign(blank(state.ui), obj, { ui: Object.assign({}, UI_DEFAULT, obj.ui || state.ui) }); save(); render(); msg('Daten geladen.');
   }
 
+
+  /* ---------- Verschlüsselte Sicherung (Web Crypto: PBKDF2-SHA-256 + AES-256-GCM) ---------- */
+  const BACKUP_FORMAT = 'kopf-sortiert-sicherung';
+  const KDF_ITER = 600000;
+  const b64enc = (buf) => { const b = new Uint8Array(buf); let str = ''; for (let i = 0; i < b.length; i += 0x8000) str += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000)); return btoa(str); };
+  const b64dec = (str) => Uint8Array.from(atob(str), (c) => c.charCodeAt(0));
+  const cryptoOk = () => !!(window.crypto && crypto.subtle && window.isSecureContext !== false);
+  async function deriveKey(pw, salt, iterations) {
+    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+  }
+  async function encryptBackup(obj, pw) {
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const key = await deriveKey(pw, salt, KDF_ITER);
+    const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(JSON.stringify(obj)));
+    return JSON.stringify({
+      format: BACKUP_FORMAT, v: 1, hinweis: 'Verschlüsselte Sicherung von „Kopf sortiert.“ – nur mit Passwort in der App lesbar.',
+      kdf: { name: 'PBKDF2', hash: 'SHA-256', iterations: KDF_ITER, salt: b64enc(salt) },
+      cipher: { name: 'AES-GCM', iv: b64enc(iv) }, data: b64enc(ct)
+    });
+  }
+  async function decryptBackup(o, pw) {
+    const it = Number(o.kdf && o.kdf.iterations);
+    if (!o.kdf || !o.cipher || !o.data || !(it >= 10000 && it <= 5000000)) throw new Error('format');
+    const key = await deriveKey(pw, b64dec(o.kdf.salt), it);
+    let pt;
+    try { pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64dec(o.cipher.iv) }, key, b64dec(o.data)); }
+    catch (e) { throw new Error('passwort'); }
+    return JSON.parse(new TextDecoder().decode(pt));
+  }
+  // Download: in der Online-Version über die Download-Freigabe des Viewers, sonst über einen normalen Datei-Link
+  let dlApi = null;
+  (async () => { try { if (window.claude && window.claude.use) dlApi = await window.claude.use('downloads'); } catch (e) { dlApi = null; } })();
+  const backup = { text: null, url: null, name: null };
+  function resetBackup() {
+    if (backup.url) URL.revokeObjectURL(backup.url);
+    backup.text = backup.url = backup.name = null;
+    const r = $('#bk-ready'); if (r) r.hidden = true;
+  }
+  async function createBackup() {
+    const pw = $('#bk-pw').value, pw2 = $('#bk-pw2').value;
+    if (!cryptoOk()) { msg('Verschlüsselung ist in diesem Browser nicht verfügbar. Bitte öffne die App über https (z. B. die Online-Version) in einem aktuellen Browser.'); return; }
+    if (pw.length < 8) { msg('Bitte wähle ein Passwort mit mindestens 8 Zeichen.'); $('#bk-pw').focus(); return; }
+    if (pw !== pw2) { msg('Die beiden Passwörter stimmen nicht überein.'); $('#bk-pw2').focus(); return; }
+    resetBackup();
+    const btn = $('#bk-create'); btn.disabled = true; btn.textContent = 'Verschlüssele …'; msg('');
+    try {
+      backup.text = await encryptBackup(state, pw);
+      backup.name = `kopf-sortiert-sicherung-${new Date().toISOString().slice(0, 10)}.json`;
+      backup.url = URL.createObjectURL(new Blob([backup.text], { type: 'application/json' }));
+      const a = $('#bk-file'); a.href = backup.url; a.setAttribute('download', backup.name);
+      $('#bk-pw').value = ''; $('#bk-pw2').value = '';
+      const ready = $('#bk-ready'); ready.hidden = false;
+      if (FRAMED && !dlApi) { a.hidden = true; $('#bk-hint').textContent = 'Herunterladen ist in dieser Ansicht nicht möglich. Kopiere den Code und speichere ihn z. B. in einer Notiz – er ist ebenfalls verschlüsselt.'; }
+      else a.hidden = false;
+      a.focus({ preventScroll: true });
+    } catch (e) { msg('Die Sicherung konnte nicht erstellt werden.'); }
+    finally { btn.disabled = false; btn.textContent = 'Sicherung verschlüsseln'; }
+  }
+  function downloadBackup(e) {
+    if (!backup.text) { e.preventDefault(); return; }
+    if (dlApi) {
+      e.preventDefault();
+      dlApi.save({ filename: backup.name, data: backup.text }).then(
+        () => msg('Sicherung gespeichert. Bewahre die Datei und dein Passwort getrennt voneinander auf.'),
+        (err) => {
+          const c = err && err.code;
+          if (c === 'declined') msg('Speichern abgebrochen.');
+          else if (c === 'rate_limited') msg('Bitte einen Moment warten und dann erneut tippen.');
+          else if (c === 'host_unavailable') msg('Diese App kann keine Dateien speichern. Öffne die Seite im Browser oder kopiere den Code.');
+          else msg('Herunterladen ist hier nicht möglich. Kopiere stattdessen den Code.');
+        });
+      return;
+    }
+    if (FRAMED) { e.preventDefault(); msg('Herunterladen ist in dieser Ansicht nicht möglich. Kopiere stattdessen den Code.'); return; }
+    msg('Download gestartet. Bewahre die Datei und dein Passwort getrennt voneinander auf.');
+  }
+  let importRaw = null;
+  async function importBackup() {
+    const raw = importRaw || $('#imp-text').value.trim();
+    if (!raw) { msg('Bitte wähle eine Datei aus oder füge den Code ein.'); return; }
+    let o;
+    try { o = JSON.parse(raw); } catch (e) { msg('Die Sicherung konnte nicht gelesen werden. Bitte den vollständigen Code bzw. die richtige Datei verwenden.'); return; }
+    if (o && o.format === BACKUP_FORMAT) {
+      const pw = $('#imp-pw').value;
+      if (!pw) { msg('Diese Sicherung ist verschlüsselt. Bitte gib das Passwort ein.'); $('#imp-pw').focus(); return; }
+      if (!cryptoOk()) { msg('Entschlüsseln ist in diesem Browser nicht verfügbar.'); return; }
+      const btn = $('#imp-btn'); btn.disabled = true; btn.textContent = 'Entschlüssele …';
+      try {
+        const data = await decryptBackup(o, pw);
+        importData(data); $('#imp-pw').value = ''; $('#imp-text').value = ''; importRaw = null; $('#imp-file').value = '';
+        msg('Sicherung entschlüsselt und geladen.');
+      } catch (e) {
+        msg(e.message === 'passwort' ? 'Das Passwort ist falsch oder die Datei wurde verändert.' : 'Die Sicherung ist unvollständig oder beschädigt.');
+      } finally { btn.disabled = false; btn.textContent = 'Sicherung laden'; }
+      return;
+    }
+    if (o && o.answers) { try { importData(o); importRaw = null; msg('Ältere, unverschlüsselte Sicherung geladen. Lege am besten gleich eine neue, verschlüsselte Sicherung an.'); } catch (e) { msg('Die Sicherung ist ungültig.'); } return; }
+    msg('Das ist keine Sicherung von „Kopf sortiert.“.');
+  }
+
   function onClick(e) {
     const b = e.target.closest('[data-act]'); if (!b) return;
     const act = b.dataset.act;
     if (act === 'px-add') { state.praxen.push({ name: '', datum: new Date().toISOString().slice(0, 10), status: 'angefragt', notiz: '' }); save(); render(); }
     if (act === 'px-del') { state.praxen.splice(Number(b.dataset.i), 1); save(); render(); }
     if (act === 'copy-report') copy(reportText(), 'Bericht kopiert. Du kannst ihn z. B. in eine E-Mail oder ein Dokument einfügen.');
-    if (act === 'copy-json') copy(JSON.stringify(state), 'Daten kopiert. Bewahre den Code sicher auf – er enthält Gesundheitsdaten.');
+    if (act === 'bk-create') createBackup();
+    if (act === 'bk-download') downloadBackup(e);
+    if (act === 'bk-copy' && backup.text) copy(backup.text, 'Verschlüsselter Code kopiert. Ohne dein Passwort ist er nicht lesbar.');
+    if (act === 'import') importBackup();
     if (act === 'print') window.print();
-    if (act === 'export') {
-      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `kopf-sortiert-${new Date().toISOString().slice(0, 10)}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-    }
-    if (act === 'import-text') { try { importData(JSON.parse($('#imp-text').value)); } catch (err) { msg('Der Code konnte nicht gelesen werden. Bitte den vollständigen Code einfügen.'); } }
     if (act === 'reset-ask') {
       const slot = $('#reset-confirm');
       if (slot) slot.innerHTML = 'Wirklich alles löschen? <button class="btn small danger" data-act="reset">Ja, löschen</button> <button class="btn small ghost" data-act="reset-no">Abbrechen</button>';
@@ -984,7 +1084,7 @@
     closeNav(false);
     const p = $('#settings'); p.hidden = false; $('.set-btn').setAttribute('aria-expanded', 'true');
     menuOpened();
-    applyUi(); showSaveStatus(); showTab(tab || openSettings.last || 'ansicht', !isSmall());
+    resetBackup(); applyUi(); showSaveStatus(); showTab(tab || openSettings.last || 'ansicht', !isSmall());
   }
   function closeSettings(restore = true) {
     const p = $('#settings'); if (p.hidden) return;
@@ -1031,9 +1131,15 @@
   document.addEventListener('click', onClick);
   document.addEventListener('change', (e) => {
     if (e.target.id !== 'imp-file' || !e.target.files[0]) return;
-    const fr = new FileReader();
-    fr.onload = () => { try { importData(JSON.parse(fr.result)); } catch (err) { msg('Die Datei konnte nicht gelesen werden.'); } };
-    fr.readAsText(e.target.files[0]);
+    const f = e.target.files[0]; const fr = new FileReader();
+    fr.onload = () => {
+      importRaw = String(fr.result);
+      let enc = false; try { enc = JSON.parse(importRaw).format === BACKUP_FORMAT; } catch (err) { /* wird beim Laden gemeldet */ }
+      msg(`Datei „${f.name}“ ausgewählt.${enc ? ' Sie ist verschlüsselt – gib das Passwort ein und tippe auf „Sicherung laden“.' : ' Tippe auf „Sicherung laden“.'}`);
+      if (enc) $('#imp-pw').focus();
+    };
+    fr.onerror = () => msg('Die Datei konnte nicht gelesen werden.');
+    fr.readAsText(f);
   });
   document.addEventListener('keydown', onKey);
   window.addEventListener('pagehide', () => { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) { /* */ } });
@@ -1043,7 +1149,8 @@
   });
   document.addEventListener('click', (e) => { const p = $('#settings'); if (p && !p.hidden && !e.target.closest('#settings, [data-act="settings"]')) closeSettings(); });
   document.addEventListener('click', (e) => { const l = e.target.closest('#nav a'); if (l && l.getAttribute('href') === (location.hash || '#start')) closeNav(false); });
-  if (FRAMED) document.querySelectorAll('[data-top-only]').forEach((el) => el.remove());
+  document.addEventListener('change', (e) => { if (e.target.id === 'bk-show') ['#bk-pw', '#bk-pw2'].forEach((q) => { $(q).type = e.target.checked ? 'text' : 'password'; }); });
+  document.addEventListener('input', (e) => { if (e.target.id === 'imp-text') importRaw = null; if (e.target.id === 'bk-pw' || e.target.id === 'bk-pw2') resetBackup(); });
   showSaveStatus();
   window.addEventListener('hashchange', () => { render(); window.scrollTo(0, 0); try { speechSynthesis.cancel(); } catch (e) { /* */ } });
   // Pausen-Erinnerung: zählt nur Minuten, in denen tatsächlich geantwortet wurde

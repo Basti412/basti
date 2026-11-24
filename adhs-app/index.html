@@ -53,19 +53,30 @@
       </ul>
       <p class="help">Leg deshalb ab und zu eine Sicherung an, vor allem vor einem Gerätewechsel.</p>
     </div>
-    <div class="pane-sec">
-      <h3>Sicherung anlegen</h3>
-      <div class="row">
-        <button class="btn small" data-act="export" data-top-only>Als Datei sichern</button>
-        <button class="btn small" data-act="copy-json">Als Code kopieren</button>
-      </div>
-      <p class="help">Die Sicherung enthält Gesundheitsdaten. Bewahre sie sicher auf und schick sie nicht unverschlüsselt per E-Mail.</p>
-    </div>
-    <details class="pane-sec imp"><summary>Sicherung laden</summary>
+    <div class="pane-sec backup">
+      <h3>Verschlüsselte Sicherung anlegen</h3>
+      <p class="help">Die Sicherung wird mit deinem Passwort verschlüsselt (AES-256). Ohne das Passwort kann niemand sie lesen – auch du nicht. Es gibt keine Möglichkeit, ein vergessenes Passwort wiederherzustellen. Notiere es dir an einem sicheren Ort.</p>
       <div class="fields">
-        <label class="lbl" for="imp-file">Datei auswählen (.json)</label><input type="file" id="imp-file" accept="application/json,.json">
-        <label class="lbl" for="imp-text">oder gesicherten Code einfügen</label><textarea id="imp-text" rows="3" placeholder='{"v":1, …}'></textarea>
-        <button class="btn small" data-act="import-text">Code laden</button>
+        <div class="field"><label class="lbl" for="bk-pw">Passwort (mindestens 8 Zeichen)</label><input type="password" id="bk-pw" autocomplete="new-password"></div>
+        <div class="field"><label class="lbl" for="bk-pw2">Passwort wiederholen</label><input type="password" id="bk-pw2" autocomplete="new-password"></div>
+        <label class="chk"><input type="checkbox" id="bk-show"><span>Passwörter anzeigen</span></label>
+      </div>
+      <button class="btn small primary" data-act="bk-create" id="bk-create">Sicherung verschlüsseln</button>
+      <div id="bk-ready" class="bk-ready" hidden>
+        <p><b>✓ Deine Sicherung ist verschlüsselt und bereit.</b></p>
+        <div class="row">
+          <a class="btn small primary" id="bk-file" data-act="bk-download" href="#" download="kopf-sortiert-sicherung.json">Als Datei herunterladen</a>
+          <button class="btn small" data-act="bk-copy">Als Code kopieren</button>
+        </div>
+        <p class="help" id="bk-hint">Auf dem iPhone landet die Datei in der App „Dateien“ (Ordner „Downloads“), auf Android und am PC im Download-Ordner.</p>
+      </div>
+    </div>
+    <details class="pane-sec imp" id="imp"><summary>Sicherung laden</summary>
+      <div class="fields">
+        <label class="lbl" for="imp-file">Datei auswählen (.json)</label><input type="file" id="imp-file" accept="application/json,.json,text/plain">
+        <label class="lbl" for="imp-text">oder Code der Sicherung einfügen</label><textarea id="imp-text" rows="3" placeholder="Code der Sicherung"></textarea>
+        <div class="field"><label class="lbl" for="imp-pw">Passwort der Sicherung</label><input type="password" id="imp-pw" autocomplete="current-password"></div>
+        <button class="btn small" data-act="import" id="imp-btn">Sicherung laden</button>
         <p class="help">Beim Laden werden die aktuellen Angaben auf diesem Gerät ersetzt.</p>
       </div></details>
     <div class="pane-sec danger-row"><button class="btn danger" data-act="reset-ask">Alle Angaben löschen</button><span id="reset-confirm"></span></div>

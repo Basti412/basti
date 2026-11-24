@@ -57,6 +57,16 @@ Jeder Fragebogen wird ausgewertet, sobald er vollständig ist: direkt nach dem A
 
 Die Grenzbereiche (ausgenommen ASRS Teil A, DSM-5-Schwellen, PHQ-9/GAD-7) sind eigene Festlegungen zur Orientierung und nicht validiert. Fremdbeurteilungen zeigen zusätzlich die Übereinstimmung mit der Selbsteinschätzung (von 18 Merkmalen).
 
+## Verschlüsselte Sicherung
+Unter „Einstellungen → Speichern“ entsteht eine passwortgeschützte Sicherung (`kopf-sortiert-sicherung-JJJJ-MM-TT.json`), die sich als Datei herunterladen (PC, Android, iPhone → App „Dateien“) oder als Code kopieren lässt.
+
+- Verfahren: Web Crypto API, Schlüsselableitung PBKDF2-SHA-256 mit 600.000 Iterationen und 16-Byte-Salt, Verschlüsselung AES-256-GCM mit 12-Byte-IV (beides zufällig je Sicherung). GCM erkennt auch nachträgliche Veränderungen.
+- Die Datei enthält im Klartext nur Format, Version und die Verschlüsselungsparameter, keine Angaben.
+- Ohne Passwort ist keine Wiederherstellung möglich.
+- Ältere, unverschlüsselte Sicherungen lassen sich weiterhin laden.
+- Benötigt einen sicheren Kontext (https, localhost oder lokal geöffnete Datei in aktuellen Browsern).
+- Die laufende Speicherung im Browser (`localStorage`) ist nicht verschlüsselt; sie ist durch das Gerät bzw. Browserprofil geschützt.
+
 ## Wichtige Hinweise
 - Die App stellt **keine Diagnose** und ist **nicht validiert**.
 - Geschützte Instrumente (ASRS, WURS-K, ADHS-SB/HASE, DIVA-5, CAARS, WRI, WFIRS) sind **nicht im Original** enthalten. Die App bildet ihre Inhalte mit eigenen Formulierungen ab. Wörtlich übernommen sind nur die frei verwendbaren Bögen PHQ-9, GAD-7 und AUDIT-C.

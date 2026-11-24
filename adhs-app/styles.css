@@ -135,7 +135,7 @@ a { color: var(--accent); }
 .lbl { font-weight: 700; font-size: .95rem; }
 .req { color: var(--crit); margin-left: 3px; }
 .help { margin: 0; font-size: .85rem; color: var(--muted); max-width: 68ch; }
-input[type="text"], input[type="number"], input[type="date"], select, textarea {
+input[type="text"], input[type="password"], input[type="number"], input[type="date"], select, textarea {
   width: 100%; font: inherit; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px;
 }
 textarea { resize: vertical; min-height: 64px; }
@@ -510,3 +510,13 @@ body.calm *, body.calm *::before { animation: none !important; transition: none 
 
 .pane-sec.danger-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 @media (max-width: 560px) { .hero-brand { order: -1; } }
+
+/* Verschlüsselte Sicherung */
+.backup .fields { gap: 12px; }
+.backup input[type="password"], .backup input[type="text"], .imp input[type="password"] { font-size: 1rem; }
+.backup > .btn { justify-self: start; }
+.bk-ready { display: grid; gap: 8px; padding: 12px 14px; border-radius: 12px; background: var(--ok-soft); border: 1px solid color-mix(in srgb, var(--ok) 30%, var(--line)); }
+.bk-ready[hidden] { display: none; }
+.bk-ready p { margin: 0; }
+.bk-ready b { color: var(--ok); }
+.btn[disabled] { opacity: .6; cursor: progress; }
