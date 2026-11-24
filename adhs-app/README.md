@@ -61,3 +61,6 @@ Die Grenzbereiche (ausgenommen ASRS Teil A, DSM-5-Schwellen, PHQ-9/GAD-7) sind e
 - Die App stellt **keine Diagnose** und ist **nicht validiert**.
 - Geschützte Instrumente (ASRS, WURS-K, ADHS-SB/HASE, DIVA-5, CAARS, WRI, WFIRS) sind **nicht im Original** enthalten. Die App bildet ihre Inhalte mit eigenen Formulierungen ab. Wörtlich übernommen sind nur die frei verwendbaren Bögen PHQ-9, GAD-7 und AUDIT-C.
 - Der Orientierungswert der Kindheitsskala (36/100) ist aus dem WURS-K-Grenzwert (30 von 84) umgerechnet und nicht validiert.
+
+---
+made by BLsolutions

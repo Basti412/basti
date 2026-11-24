@@ -763,6 +763,7 @@
     if (rec) h += `<h3>9. Unverbindliche Einschätzung aus der Selbstauskunft</h3><p>${esc(LEVEL_TEXT[rec.level].h)}${rec.pres ? ` – ${esc(rec.pres)}` : ''}.</p>`;
     h += `<p class="disclaimer">Selbstauskunft zur Vorbereitung. Die Fragebögen dieser Mappe sind eigene Formulierungen in Anlehnung an DSM-5 und etablierte Instrumente (ASRS, WURS-K, DIVA-5, WRI, WFIRS) und ersetzen diese nicht. PHQ-9, GAD-7 und AUDIT-C entsprechen den frei verwendbaren Originalen.</p>`;
     h += `<h3>Quellen</h3><ul class="plain src">${SOURCES.map((s) => `<li>${esc(s.t)}: <a href="${s.u}" target="_blank" rel="noopener">${esc(s.u)}</a></li>`).join('')}</ul>`;
+    h += `<p class="rep-credit">Erstellt mit der ADHS-Diagnosemappe · made by ${BRAND}</p>`;
     return h;
   }
 
@@ -786,12 +787,16 @@
       return `<a href="#${m.id}" class="nlink ${m.id === current ? 'active' : ''}" ${m.id === current ? 'aria-current="page"' : ''}><span>${esc(m.title)}</span>${badge}</a>`;
     }).join('')}</div>`).join('');
   }
+  const BRAND = 'BLsolutions';
+  function footerHtml() {
+    return `<footer class="site-foot"><span class="foot-app">ADHS-Diagnosemappe</span><span class="foot-sep" aria-hidden="true">·</span><span class="foot-brand">made by <b>${BRAND}</b></span></footer>`;
+  }
   function current() { const h = (location.hash || '').slice(1); return MOD[h] ? h : 'start'; }
   function render() {
     const id = current(); const m = MOD[id];
     $('#nav').innerHTML = navHtml(id);
     const views = { dashboard: viewDashboard, ablauf: () => viewAblauf(m), form: () => viewForm(m), scale: () => viewScale(m), dsm: () => viewDsm(m), fremd: () => viewFremd(m), checklist: () => viewChecklist(m), report: viewReport };
-    $('#main').innerHTML = isFocus(m) ? viewFocus(m) : views[m.type]();
+    $('#main').innerHTML = (isFocus(m) ? viewFocus(m) : views[m.type]()) + footerHtml();
     $('#mobile-title').textContent = m.title;
     closeNav(false);
     if (m.required || m.recommended) { state.last = id; save(); }
