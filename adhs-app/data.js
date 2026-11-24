@@ -55,24 +55,24 @@ const DSM_ITEMS = [
  * thr: ab welchem Skalenwert das Item als „auffällig“ zählt (2 = manchmal, 3 = oft) –
  * entspricht der Logik der schattierten Felder im Original. */
 const ASRS_ITEMS = [
-  { id: 's1', part: 'A', thr: 2, text: 'Wie oft fällt es Ihnen schwer, bei einer Aufgabe die letzten Details abzuschließen, wenn der herausfordernde Teil erledigt ist?' },
-  { id: 's2', part: 'A', thr: 2, text: 'Wie oft haben Sie Mühe, Dinge in die richtige Reihenfolge zu bringen, wenn eine Aufgabe Organisation erfordert?' },
-  { id: 's3', part: 'A', thr: 2, text: 'Wie oft haben Sie Schwierigkeiten, sich an Termine oder Verpflichtungen zu erinnern?' },
-  { id: 's4', part: 'A', thr: 3, text: 'Wie oft vermeiden oder verschieben Sie den Beginn einer Aufgabe, die viel Nachdenken erfordert?' },
-  { id: 's5', part: 'A', thr: 3, text: 'Wie oft zappeln Sie mit Händen oder Füßen oder winden sich, wenn Sie längere Zeit sitzen müssen?' },
-  { id: 's6', part: 'A', thr: 3, text: 'Wie oft fühlen Sie sich übermäßig aktiv und gedrängt, Dinge zu tun – als würden Sie von einem Motor angetrieben?' },
-  { id: 's7', part: 'B', thr: 3, text: 'Wie oft machen Sie Flüchtigkeitsfehler, wenn Sie an einer langweiligen oder schwierigen Aufgabe arbeiten?' },
-  { id: 's8', part: 'B', thr: 3, text: 'Wie oft fällt es Ihnen schwer, bei langweiliger oder wiederholender Arbeit aufmerksam zu bleiben?' },
-  { id: 's9', part: 'B', thr: 2, text: 'Wie oft haben Sie Schwierigkeiten, sich auf das zu konzentrieren, was Ihr Gegenüber sagt – auch wenn es direkt mit Ihnen spricht?' },
-  { id: 's10', part: 'B', thr: 3, text: 'Wie oft verlegen Sie Dinge zu Hause oder bei der Arbeit oder haben Mühe, sie wiederzufinden?' },
-  { id: 's11', part: 'B', thr: 3, text: 'Wie oft werden Sie durch Aktivität oder Geräusche in Ihrer Umgebung abgelenkt?' },
-  { id: 's12', part: 'B', thr: 2, text: 'Wie oft verlassen Sie in Besprechungen oder anderen Situationen Ihren Platz, obwohl Sitzenbleiben erwartet wird?' },
-  { id: 's13', part: 'B', thr: 3, text: 'Wie oft fühlen Sie sich unruhig oder zappelig?' },
-  { id: 's14', part: 'B', thr: 3, text: 'Wie oft fällt es Ihnen schwer, in der Freizeit abzuschalten und sich zu entspannen?' },
-  { id: 's15', part: 'B', thr: 3, text: 'Wie oft reden Sie in Gesellschaft zu viel?' },
-  { id: 's16', part: 'B', thr: 2, text: 'Wie oft beenden Sie Sätze anderer, bevor diese sie selbst beenden können?' },
-  { id: 's17', part: 'B', thr: 3, text: 'Wie oft fällt es Ihnen schwer zu warten, bis Sie an der Reihe sind?' },
-  { id: 's18', part: 'B', thr: 2, text: 'Wie oft unterbrechen Sie andere, wenn diese beschäftigt sind?' }
+  { id: 's1', part: 'A', thr: 2, text: 'Wie oft fällt es dir schwer, bei einer Aufgabe die letzten Details abzuschließen, wenn der herausfordernde Teil erledigt ist?' },
+  { id: 's2', part: 'A', thr: 2, text: 'Wie oft hast du Mühe, Dinge in die richtige Reihenfolge zu bringen, wenn eine Aufgabe Organisation erfordert?' },
+  { id: 's3', part: 'A', thr: 2, text: 'Wie oft hast du Schwierigkeiten, dich an Termine oder Verpflichtungen zu erinnern?' },
+  { id: 's4', part: 'A', thr: 3, text: 'Wie oft vermeidest oder verschiebst du den Beginn einer Aufgabe, die viel Nachdenken erfordert?' },
+  { id: 's5', part: 'A', thr: 3, text: 'Wie oft zappelst du mit Händen oder Füßen oder windest dich, wenn du längere Zeit sitzen musst?' },
+  { id: 's6', part: 'A', thr: 3, text: 'Wie oft fühlst du dich übermäßig aktiv und gedrängt, Dinge zu tun – als würdest du von einem Motor angetrieben?' },
+  { id: 's7', part: 'B', thr: 3, text: 'Wie oft machst du Flüchtigkeitsfehler, wenn du an einer langweiligen oder schwierigen Aufgabe arbeiten?' },
+  { id: 's8', part: 'B', thr: 3, text: 'Wie oft fällt es dir schwer, bei langweiliger oder wiederholender Arbeit aufmerksam zu bleiben?' },
+  { id: 's9', part: 'B', thr: 2, text: 'Wie oft hast du Schwierigkeiten, dich auf das zu konzentrieren, was dein Gegenüber sagt – auch wenn es direkt mit dir spricht?' },
+  { id: 's10', part: 'B', thr: 3, text: 'Wie oft verlegst du Dinge zu Hause oder bei der Arbeit oder hast Mühe, sie wiederzufinden?' },
+  { id: 's11', part: 'B', thr: 3, text: 'Wie oft wirst du durch Aktivität oder Geräusche in deiner Umgebung abgelenkt?' },
+  { id: 's12', part: 'B', thr: 2, text: 'Wie oft verlässt du in Besprechungen oder anderen Situationen deinen Platz, obwohl Sitzenbleiben erwartet wird?' },
+  { id: 's13', part: 'B', thr: 3, text: 'Wie oft fühlst du dich unruhig oder zappelig?' },
+  { id: 's14', part: 'B', thr: 3, text: 'Wie oft fällt es dir schwer, in der Freizeit abzuschalten und dich zu entspannen?' },
+  { id: 's15', part: 'B', thr: 3, text: 'Wie oft redest du in Gesellschaft zu viel?' },
+  { id: 's16', part: 'B', thr: 2, text: 'Wie oft beendest du Sätze anderer, bevor diese sie selbst beenden können?' },
+  { id: 's17', part: 'B', thr: 3, text: 'Wie oft fällt es dir schwer zu warten, bis du an der Reihe bist?' },
+  { id: 's18', part: 'B', thr: 2, text: 'Wie oft unterbrichst du andere, wenn diese beschäftigt sind?' }
 ];
 
 /* Retrospektive Kindheitsskala (8–10 Jahre), eigene Items zu den Themen der WURS-K */
@@ -150,15 +150,15 @@ const FUNC_ITEMS = [
 ];
 
 const PHQ9_ITEMS = [
-  'Wenig Interesse oder Freude an Ihren Tätigkeiten',
+  'Wenig Interesse oder Freude an deinen Tätigkeiten',
   'Niedergeschlagenheit, Schwermut oder Hoffnungslosigkeit',
   'Schwierigkeiten, ein- oder durchzuschlafen, oder vermehrter Schlaf',
   'Müdigkeit oder Gefühl, keine Energie zu haben',
   'Verminderter Appetit oder übermäßiges Bedürfnis zu essen',
   'Schlechte Meinung von sich selbst; Gefühl, ein Versager zu sein oder die Familie enttäuscht zu haben',
   'Schwierigkeiten, sich auf etwas zu konzentrieren, z. B. beim Zeitunglesen oder Fernsehen',
-  'Waren Ihre Bewegungen oder Ihre Sprache so verlangsamt, dass es auch anderen auffallen würde? Oder waren Sie im Gegenteil „zappelig“ oder ruhelos und hatten dadurch einen stärkeren Bewegungsdrang als sonst?',
-  'Gedanken, dass Sie lieber tot wären oder sich Leid zufügen möchten'
+  'Waren deine Bewegungen oder deine Sprache so verlangsamt, dass es auch anderen auffallen würde? Oder warst du im Gegenteil „zappelig“ oder ruhelos und hattest dadurch einen stärkeren Bewegungsdrang als sonst?',
+  'Gedanken, dass du lieber tot wärst oder dir Leid zufügen möchtest'
 ].map((t, i) => ({ id: 'p' + (i + 1), text: t }));
 
 const GAD7_ITEMS = [
@@ -177,7 +177,7 @@ const MODULES = [
   { id: 'ablauf', group: 'Überblick', title: 'Diagnoseweg in Deutschland', type: 'ablauf' },
 
   { id: 'person', group: 'Angaben', title: 'Persönliche Angaben & Anliegen', type: 'form', required: true,
-    intro: 'Diese Angaben bilden den Rahmen des Erstgesprächs. Je konkreter Sie Ihr Anliegen beschreiben, desto schneller kommt das Gespräch auf den Punkt. Name und Kontaktdaten sind freiwillig.',
+    intro: 'Diese Angaben bilden den Rahmen des Erstgesprächs. Je konkreter du dein Anliegen beschreibst, desto schneller kommt das Gespräch auf den Punkt. Name und Kontaktdaten sind freiwillig.',
     sections: [
       { title: 'Stammdaten', fields: [
         { id: 'name', label: 'Name (freiwillig)', type: 'text' },
@@ -188,38 +188,38 @@ const MODULES = [
         { id: 'taetigkeit', label: 'Aktuelle Tätigkeit (Beruf, Ausbildung, Studium)', type: 'text', req: true }
       ]},
       { title: 'Anliegen', fields: [
-        { id: 'anlass', label: 'Warum möchten Sie sich jetzt untersuchen lassen?', type: 'textarea', req: true, help: 'Z. B. Probleme im Job, Partner/in hat ADHS vermutet, eigenes Kind wurde diagnostiziert.' },
+        { id: 'anlass', label: 'Warum möchtest du dich jetzt untersuchen lassen?', type: 'textarea', req: true, help: 'Z. B. Probleme im Job, Partner/in hat ADHS vermutet, eigenes Kind wurde diagnostiziert.' },
         { id: 'ausloeser', label: 'Was hat den Verdacht ausgelöst? (Mehrfachauswahl)', type: 'checks', options: ['Eigenes Kind oder Verwandte mit ADHS-Diagnose', 'Hinweis von Partner/in, Familie oder Freunden', 'Hinweis von Ärztin/Arzt oder Therapeut/in', 'Probleme in Beruf/Studium', 'Medien, Bücher, Social Media', 'Andere Behandlung hat nicht geholfen', 'Sonstiges'] },
-        { id: 'beschwerden', label: 'Ihre drei wichtigsten Beschwerden im Alltag', type: 'textarea', req: true, help: 'Möglichst konkret: „Ich verpasse jede Woche Fristen, weil …“ statt „Ich bin unkonzentriert“.' },
-        { id: 'seit', label: 'Seit wann bemerken Sie diese Schwierigkeiten?', type: 'select', req: true, options: ['Schon immer / seit der Kindheit', 'Seit der Jugend', 'Seit dem Erwachsenenalter', 'Erst seit kurzem (unter 1 Jahr)', 'Weiß nicht'] },
+        { id: 'beschwerden', label: 'Deine drei wichtigsten Beschwerden im Alltag', type: 'textarea', req: true, help: 'Möglichst konkret: „Ich verpasse jede Woche Fristen, weil …“ statt „Ich bin unkonzentriert“.' },
+        { id: 'seit', label: 'Seit wann bemerkst du diese Schwierigkeiten?', type: 'select', req: true, options: ['Schon immer / seit der Kindheit', 'Seit der Jugend', 'Seit dem Erwachsenenalter', 'Erst seit kurzem (unter 1 Jahr)', 'Weiß nicht'] },
         { id: 'leidensdruck', label: 'Leidensdruck insgesamt', type: 'range', req: true, min: 0, max: 10, help: '0 = gar nicht belastet, 10 = extrem belastet' },
-        { id: 'ziele', label: 'Was erhoffen Sie sich von der Diagnostik?', type: 'textarea', help: 'Z. B. Klarheit, Behandlung, Nachteilsausgleich, Verständnis im Umfeld.' }
+        { id: 'ziele', label: 'Was erhoffst du dir von der Diagnostik?', type: 'textarea', help: 'Z. B. Klarheit, Behandlung, Nachteilsausgleich, Verständnis im Umfeld.' }
       ]},
       { title: 'Fremdauskunft', fields: [
-        { id: 'eltern', label: 'Können Eltern oder andere Bezugspersonen Auskunft über Ihre Kindheit geben?', type: 'select', req: true, options: ['Ja, beide Eltern', 'Ja, ein Elternteil', 'Ja, Geschwister/andere Verwandte', 'Nein, niemand verfügbar'] },
-        { id: 'partner', label: 'Gibt es eine Person, die Sie aktuell gut kennt (Partner/in, Freund/in)?', type: 'select', req: true, options: ['Ja', 'Nein'] }
+        { id: 'eltern', label: 'Können Eltern oder andere Bezugspersonen Auskunft über deine Kindheit geben?', type: 'select', req: true, options: ['Ja, beide Eltern', 'Ja, ein Elternteil', 'Ja, Geschwister/andere Verwandte', 'Nein, niemand verfügbar'] },
+        { id: 'partner', label: 'Gibt es eine Person, die dich aktuell gut kennt (Partner/in, Freund/in)?', type: 'select', req: true, options: ['Ja', 'Nein'] }
       ]}
     ]
   },
 
   { id: 'asrs', group: 'Selbstbeurteilung', title: 'Screening (ASRS-Typ)', type: 'scale', required: true, scale: 'freq5', items: ASRS_ITEMS,
     instrument: 'Angelehnt an die Adult ADHD Self-Report Scale ASRS v1.1 der WHO',
-    intro: 'Kurzes Screening mit 18 Fragen. Beziehen Sie sich auf die letzten 6 Monate. Teil A (Fragen 1–6) gilt als der aussagekräftigste Screening-Teil. Das Original wird in vielen Praxen als erster Fragebogen eingesetzt.'
+    intro: 'Kurzes Screening mit 18 Fragen. Beziehe dich auf die letzten 6 Monate. Teil A (Fragen 1–6) gilt als der aussagekräftigste Screening-Teil. Das Original wird in vielen Praxen als erster Fragebogen eingesetzt.'
   },
   { id: 'dsm-aktuell', group: 'Selbstbeurteilung', title: 'Symptomcheckliste heute', type: 'dsm', which: 'adult', required: true, scale: 'sev4',
     instrument: 'Strukturiert nach den 18 Symptomkriterien von DSM-5 (Kriterium A) – wie ADHS-SB und DIVA-5',
-    intro: 'Bewerten Sie, wie stark jedes Merkmal in den letzten 6 Monaten auf Sie zutraf. Notieren Sie, wenn möglich, ein konkretes Beispiel aus Ihrem Alltag. Genau diese Beispiele fragt die Fachärztin oder der Facharzt im strukturierten Interview (z. B. DIVA-5) ab – vorbereitet sparen sie viel Zeit.',
+    intro: 'Bewerte, wie stark jedes Merkmal in den letzten 6 Monaten auf dich zutraf. Notiere, wenn möglich, ein konkretes Beispiel aus deinem Alltag. Genau diese Beispiele fragt die Fachärztin oder der Facharzt im strukturierten Interview (z. B. DIVA-5) ab – vorbereitet sparen sie viel Zeit.',
     extra: [
       { id: 'beginn', label: 'Wann sind mehrere dieser Merkmale zum ersten Mal aufgetreten? (Kriterium B)', type: 'select', req: true, options: ['Vor dem 12. Lebensjahr', 'Zwischen 12 und 17 Jahren', 'Erst im Erwachsenenalter', 'Weiß nicht'] },
       { id: 'dauer', label: 'Bestehen die Merkmale seit mindestens 6 Monaten durchgehend?', type: 'select', req: true, options: ['Ja', 'Nein', 'Unsicher'] },
       { id: 'bereiche', label: 'In welchen Lebensbereichen treten die Merkmale auf? (Kriterium C)', type: 'checks', req: true, options: ['Beruf / Ausbildung / Studium', 'Partnerschaft / Familie', 'Freundeskreis / soziale Kontakte', 'Freizeit / Hobbys', 'Haushalt / Alltagsorganisation', 'Straßenverkehr', 'Keinem Bereich'] },
-      { id: 'beeintr', label: 'Wie stark beeinträchtigen Sie die Merkmale insgesamt? (Kriterium D)', type: 'select', req: true, options: ['Gar nicht', 'Leicht', 'Deutlich', 'Schwer'] },
+      { id: 'beeintr', label: 'Wie stark beeinträchtigen dich die Merkmale insgesamt? (Kriterium D)', type: 'select', req: true, options: ['Gar nicht', 'Leicht', 'Deutlich', 'Schwer'] },
       { id: 'phasen', label: 'Treten die Merkmale nur in bestimmten Phasen auf, z. B. nur während einer Depression, nach einem Trauma oder unter Substanzkonsum? (Kriterium E)', type: 'select', req: true, options: ['Nein, sie sind durchgehend da', 'Ja, nur in bestimmten Phasen', 'Unsicher'] }
     ]
   },
   { id: 'dsm-kindheit', group: 'Selbstbeurteilung', title: 'Symptomcheckliste Kindheit', type: 'dsm', which: 'child', required: true, scale: 'sev4',
     instrument: 'DSM-5-Kriterium A, retrospektiv für das Alter von 5–12 Jahren (wie im Kindheitsteil der DIVA-5)',
-    intro: 'Wie waren Sie als Kind im Grundschulalter? Hilfreich sind Zeugnisse, Fotos, Erzählungen von Eltern oder Geschwistern. Wenn Sie unsicher sind, wählen Sie die Stufe, die am ehesten passt, und notieren Sie die Quelle Ihrer Erinnerung.'
+    intro: 'Wie warst du als Kind im Grundschulalter? Hilfreich sind Zeugnisse, Fotos, Erzählungen von Eltern oder Geschwistern. Wenn du unsicher bist, wähle die Stufe, die am ehesten passt, und notiere die Quelle deiner Erinnerung.'
   },
   { id: 'kindheit-skala', group: 'Selbstbeurteilung', title: 'Kindheitsskala (WURS-Typ)', type: 'scale', required: true, scale: 'wurs5', items: WURS_ITEMS,
     instrument: 'Eigene Items zu den Themen der Wender Utah Rating Scale – Kurzform (WURS-K)',
@@ -231,12 +231,12 @@ const MODULES = [
   },
   { id: 'alltag', group: 'Selbstbeurteilung', title: 'Beeinträchtigung im Alltag', type: 'scale', required: true, scale: 'func4', items: FUNC_ITEMS, grouped: 'dom',
     instrument: 'Bereiche angelehnt an die Weiss Functional Impairment Rating Scale (WFIRS-S)',
-    intro: 'Eine Diagnose setzt voraus, dass die Merkmale das Leben spürbar beeinträchtigen (DSM-5-Kriterium D). Bewerten Sie die letzten 6 Monate. Wählen Sie „Betrifft mich nicht“, wenn der Bereich für Sie nicht relevant ist (z. B. kein Führerschein).'
+    intro: 'Eine Diagnose setzt voraus, dass die Merkmale das Leben spürbar beeinträchtigen (DSM-5-Kriterium D). Bewerte die letzten 6 Monate. Wähle „Betrifft mich nicht“, wenn der Bereich für dich nicht relevant ist (z. B. kein Führerschein).'
   },
 
   { id: 'fremd-aktuell', group: 'Fremdbeurteilung', title: 'Fremdbeurteilung heute', type: 'fremd', which: 'adult', scale: 'sev4', recommended: true,
     instrument: 'DSM-5-Kriterium A aus Sicht einer nahestehenden Person (wie ADHS-FB / CAARS-Fremdbeurteilung)',
-    intro: 'Bitten Sie Ihre Partnerin, Ihren Partner oder eine gute Freundin/einen guten Freund, diesen Bogen auszufüllen – am besten ohne Ihre eigenen Antworten zu kennen. Die Person kann direkt auf diesem Gerät antworten oder die Antworten eines Papierbogens werden hier übertragen.'
+    intro: 'Bitte deine Partnerin, deinen Partner oder eine gute Freundin/einen guten Freund, diesen Bogen auszufüllen – am besten ohne deine eigenen Antworten zu kennen. Die Person kann direkt auf diesem Gerät antworten oder die Antworten eines Papierbogens werden hier übertragen.'
   },
   { id: 'fremd-kindheit', group: 'Fremdbeurteilung', title: 'Fremdbeurteilung Kindheit', type: 'fremd', which: 'child', scale: 'sev4', recommended: true,
     instrument: 'DSM-5-Kriterium A, Kindheit 5–12 Jahre, aus Sicht von Eltern/Geschwistern',
@@ -245,72 +245,72 @@ const MODULES = [
 
   { id: 'phq9', group: 'Abgrenzung', title: 'Stimmung (PHQ-9)', type: 'scale', required: true, scale: 'phq4', items: PHQ9_ITEMS,
     instrument: 'Patient Health Questionnaire PHQ-9 (deutsche Fassung PHQ-D), frei verwendbar',
-    intro: 'Wie oft fühlten Sie sich im Verlauf der letzten 2 Wochen durch die folgenden Beschwerden beeinträchtigt? Depressionen können Konzentrationsprobleme verursachen und treten häufig zusätzlich zu ADHS auf. Die Fachärztin oder der Facharzt muss beides voneinander abgrenzen.'
+    intro: 'Wie oft fühltest du dich im Verlauf der letzten 2 Wochen durch die folgenden Beschwerden beeinträchtigt? Depressionen können Konzentrationsprobleme verursachen und treten häufig zusätzlich zu ADHS auf. Die Fachärztin oder der Facharzt muss beides voneinander abgrenzen.'
   },
   { id: 'gad7', group: 'Abgrenzung', title: 'Angst (GAD-7)', type: 'scale', required: true, scale: 'phq4', items: GAD7_ITEMS,
     instrument: 'Generalized Anxiety Disorder Scale GAD-7 (deutsche Fassung), frei verwendbar',
-    intro: 'Wie oft fühlten Sie sich im Verlauf der letzten 2 Wochen durch die folgenden Beschwerden beeinträchtigt? Angststörungen können Unruhe und Konzentrationsprobleme verursachen.'
+    intro: 'Wie oft fühltest du dich im Verlauf der letzten 2 Wochen durch die folgenden Beschwerden beeinträchtigt? Angststörungen können Unruhe und Konzentrationsprobleme verursachen.'
   },
   { id: 'differenzial', group: 'Abgrenzung', title: 'Weitere Abklärung', type: 'form', required: true,
     intro: 'Laut S3-Leitlinie muss geprüft werden, ob andere Ursachen die Beschwerden besser erklären oder zusätzlich vorliegen. Diese Fragen sind kein Test, sondern eine Checkliste für das Gespräch. Ein „Ja“ bedeutet nicht, dass eine weitere Erkrankung vorliegt.',
     sections: [
       { title: 'Stimmungsphasen (Abgrenzung bipolare Störung)', fields: [
-        { id: 'bp1', label: 'Hatten Sie Phasen von mehreren Tagen mit ungewöhnlich gehobener oder gereizter Stimmung und deutlich mehr Energie als sonst?', type: 'yn', req: true },
-        { id: 'bp2', label: 'Brauchten Sie in solchen Phasen viel weniger Schlaf, ohne müde zu sein?', type: 'yn', req: true },
-        { id: 'bp3', label: 'Hatten Sie in solchen Phasen Rededrang, Gedankenrasen oder haben viel Geld ausgegeben?', type: 'yn', req: true },
-        { id: 'bp4', label: 'Waren diese Phasen klar von Ihrem „normalen Ich“ abgegrenzt (Beginn und Ende erkennbar)?', type: 'yn', req: true, help: 'ADHS-Merkmale sind eher durchgehend vorhanden, bipolare Episoden haben Anfang und Ende.' }
+        { id: 'bp1', label: 'Hattest du Phasen von mehreren Tagen mit ungewöhnlich gehobener oder gereizter Stimmung und deutlich mehr Energie als sonst?', type: 'yn', req: true },
+        { id: 'bp2', label: 'Brauchtest du in solchen Phasen viel weniger Schlaf, ohne müde zu sein?', type: 'yn', req: true },
+        { id: 'bp3', label: 'Hattest du in solchen Phasen Rededrang, Gedankenrasen oder hast viel Geld ausgegeben?', type: 'yn', req: true },
+        { id: 'bp4', label: 'Waren diese Phasen klar von deinem „normalen Ich“ abgegrenzt (Beginn und Ende erkennbar)?', type: 'yn', req: true, help: 'ADHS-Merkmale sind eher durchgehend vorhanden, bipolare Episoden haben Anfang und Ende.' }
       ]},
       { title: 'Autismus-Spektrum', fields: [
-        { id: 'as1', label: 'Sind Smalltalk und ungeschriebene soziale Regeln für Sie anstrengend und nicht intuitiv?', type: 'yn', req: true },
-        { id: 'as2', label: 'Brauchen Sie feste Routinen und reagieren stark, wenn diese durchbrochen werden?', type: 'yn', req: true },
-        { id: 'as3', label: 'Haben Sie sehr intensive, eng umschriebene Spezialinteressen?', type: 'yn', req: true },
-        { id: 'as4', label: 'Sind Sie überempfindlich gegenüber Geräuschen, Licht, Gerüchen oder Stoffen auf der Haut?', type: 'yn', req: true },
-        { id: 'as5', label: 'Fällt es Ihnen schwer, Mimik, Ironie oder Andeutungen anderer zu deuten?', type: 'yn', req: true },
+        { id: 'as1', label: 'Sind Smalltalk und ungeschriebene soziale Regeln für dich anstrengend und nicht intuitiv?', type: 'yn', req: true },
+        { id: 'as2', label: 'Brauchst du feste Routinen und reagierst stark, wenn diese durchbrochen werden?', type: 'yn', req: true },
+        { id: 'as3', label: 'Hast du sehr intensive, eng umschriebene Spezialinteressen?', type: 'yn', req: true },
+        { id: 'as4', label: 'Bist du überempfindlich gegenüber Geräuschen, Licht, Gerüchen oder Stoffen auf der Haut?', type: 'yn', req: true },
+        { id: 'as5', label: 'Fällt es dir schwer, Mimik, Ironie oder Andeutungen anderer zu deuten?', type: 'yn', req: true },
         { id: 'as6', label: 'Bestanden diese Besonderheiten schon in der Kindheit?', type: 'yn', req: true }
       ]},
       { title: 'Emotionale Instabilität', fields: [
-        { id: 'bl1', label: 'Haben Sie starke Angst, verlassen zu werden, und tun viel, um das zu verhindern?', type: 'yn', req: true },
-        { id: 'bl2', label: 'Haben Sie sich schon einmal absichtlich selbst verletzt?', type: 'yn', req: true },
-        { id: 'bl3', label: 'Kennen Sie ein anhaltendes, quälendes Gefühl innerer Leere?', type: 'yn', req: true },
-        { id: 'bl4', label: 'Schwankt Ihr Bild von sich selbst stark (wer Sie sind, was Sie wollen)?', type: 'yn', req: true },
-        { id: 'bl5', label: 'Sind Ihre engen Beziehungen sehr intensiv und wechselhaft (Idealisierung und Abwertung)?', type: 'yn', req: true }
+        { id: 'bl1', label: 'Hast du starke Angst, verlassen zu werden, und tust viel, um das zu verhindern?', type: 'yn', req: true },
+        { id: 'bl2', label: 'Hast du dich schon einmal absichtlich selbst verletzt?', type: 'yn', req: true },
+        { id: 'bl3', label: 'Kennst du ein anhaltendes, quälendes Gefühl innerer Leere?', type: 'yn', req: true },
+        { id: 'bl4', label: 'Schwankt dein Bild von dir selbst stark (wer du bist, was du willst)?', type: 'yn', req: true },
+        { id: 'bl5', label: 'Sind deine engen Beziehungen sehr intensiv und wechselhaft (Idealisierung und Abwertung)?', type: 'yn', req: true }
       ]},
       { title: 'Schlaf', fields: [
-        { id: 'sl1', label: 'Schnarchen Sie laut, oder wurden Atemaussetzer im Schlaf beobachtet?', type: 'yn', req: true, help: 'Eine Schlafapnoe kann Konzentrationsprobleme verursachen.' },
-        { id: 'sl2', label: 'Ist Ihr Schlaf trotz ausreichender Dauer nicht erholsam?', type: 'yn', req: true },
-        { id: 'sl3', label: 'Schlafen Sie tagsüber ungewollt ein (z. B. beim Lesen, Fernsehen, Beifahren)?', type: 'yn', req: true },
-        { id: 'sl4', label: 'Haben Sie abends unruhige, kribbelnde Beine mit Bewegungsdrang?', type: 'yn', req: true },
-        { id: 'sl5', label: 'Arbeiten Sie im Schichtdienst oder ist Ihr Schlafrhythmus stark verschoben?', type: 'yn', req: true }
+        { id: 'sl1', label: 'Schnarchst du laut, oder wurden Atemaussetzer im Schlaf beobachtet?', type: 'yn', req: true, help: 'Eine Schlafapnoe kann Konzentrationsprobleme verursachen.' },
+        { id: 'sl2', label: 'Ist dein Schlaf trotz ausreichender Dauer nicht erholsam?', type: 'yn', req: true },
+        { id: 'sl3', label: 'Schläfst du tagsüber ungewollt ein (z. B. beim Lesen, Fernsehen, Beifahren)?', type: 'yn', req: true },
+        { id: 'sl4', label: 'Hast du abends unruhige, kribbelnde Beine mit Bewegungsdrang?', type: 'yn', req: true },
+        { id: 'sl5', label: 'Arbeitest du im Schichtdienst oder ist dein Schlafrhythmus stark verschoben?', type: 'yn', req: true }
       ]},
       { title: 'Belastende Erlebnisse, Angst, Zwang', fields: [
-        { id: 'tr1', label: 'Haben Sie sehr belastende Ereignisse erlebt, die Sie bis heute in Erinnerungen, Albträumen oder Flashbacks verfolgen?', type: 'yn', req: true },
-        { id: 'tr2', label: 'Sind Sie dauerhaft angespannt, schreckhaft und „auf der Hut“?', type: 'yn', req: true },
-        { id: 'zw1', label: 'Haben Sie Zwangsgedanken oder Zwangshandlungen (z. B. Kontrollieren, Waschen), die viel Zeit kosten?', type: 'yn', req: true }
+        { id: 'tr1', label: 'Hast du sehr belastende Ereignisse erlebt, die dich bis heute in Erinnerungen, Albträumen oder Flashbacks verfolgen?', type: 'yn', req: true },
+        { id: 'tr2', label: 'Bist du dauerhaft angespannt, schreckhaft und „auf der Hut“?', type: 'yn', req: true },
+        { id: 'zw1', label: 'Hast du Zwangsgedanken oder Zwangshandlungen (z. B. Kontrollieren, Waschen), die viel Zeit kosten?', type: 'yn', req: true }
       ]},
       { title: 'Entwicklung & Neurologie', fields: [
-        { id: 'le1', label: 'Wurde bei Ihnen eine Lese-Rechtschreib- oder Rechenschwäche festgestellt oder vermutet?', type: 'yn', req: true },
-        { id: 'ti1', label: 'Haben oder hatten Sie Tics (unwillkürliche Bewegungen oder Laute)?', type: 'yn', req: true },
+        { id: 'le1', label: 'Wurde bei dir eine Lese-Rechtschreib- oder Rechenschwäche festgestellt oder vermutet?', type: 'yn', req: true },
+        { id: 'ti1', label: 'Hast oder hattest du Tics (unwillkürliche Bewegungen oder Laute)?', type: 'yn', req: true },
         { id: 'ko1', label: 'Ist eine Schilddrüsenerkrankung bekannt?', type: 'yn', req: true },
-        { id: 'ko2', label: 'Hatten Sie Krampfanfälle, Epilepsie oder Absencen?', type: 'yn', req: true },
-        { id: 'ko3', label: 'Hatten Sie eine Gehirnerschütterung mit Bewusstlosigkeit oder ein Schädel-Hirn-Trauma?', type: 'yn', req: true },
+        { id: 'ko2', label: 'Hattest du Krampfanfälle, Epilepsie oder Absencen?', type: 'yn', req: true },
+        { id: 'ko3', label: 'Hattest du eine Gehirnerschütterung mit Bewusstlosigkeit oder ein Schädel-Hirn-Trauma?', type: 'yn', req: true },
         { id: 'ko4', label: 'Sind Eisenmangel, Blutarmut oder Vitamin-B12-Mangel bekannt?', type: 'yn', req: true },
         { id: 'ko5', label: 'Verstärken sich die Beschwerden deutlich mit dem Zyklus, in Schwangerschaft/Stillzeit oder in den Wechseljahren?', type: 'yn', req: true, help: 'Nur beantworten, falls zutreffend; sonst „Nein“.' }
       ]},
       { title: 'Alkohol (AUDIT-C, WHO) und andere Substanzen', fields: [
-        { id: 'au1', label: 'Wie oft trinken Sie Alkohol?', type: 'select', req: true, options: ['Nie', 'Einmal im Monat oder seltener', '2- bis 4-mal im Monat', '2- bis 3-mal pro Woche', '4-mal pro Woche oder öfter'] },
-        { id: 'au2', label: 'Wie viele alkoholische Getränke trinken Sie an einem typischen Tag, an dem Sie trinken?', type: 'select', req: true, options: ['1–2 (oder nie)', '3–4', '5–6', '7–9', '10 oder mehr'], help: '1 Getränk ≈ 0,33 l Bier, 0,125 l Wein oder 4 cl Spirituosen.' },
-        { id: 'au3', label: 'Wie oft trinken Sie 6 oder mehr Getränke bei einer Gelegenheit?', type: 'select', req: true, options: ['Nie', 'Seltener als einmal im Monat', 'Jeden Monat', 'Jede Woche', 'Täglich oder fast täglich'] },
-        { id: 'can', label: 'Wie oft konsumieren Sie Cannabis?', type: 'select', req: true, options: ['Nie', 'Früher, aktuell nicht', 'Seltener als monatlich', 'Monatlich', 'Wöchentlich', 'Täglich oder fast täglich'] },
+        { id: 'au1', label: 'Wie oft trinkst du Alkohol?', type: 'select', req: true, options: ['Nie', 'Einmal im Monat oder seltener', '2- bis 4-mal im Monat', '2- bis 3-mal pro Woche', '4-mal pro Woche oder öfter'] },
+        { id: 'au2', label: 'Wie viele alkoholische Getränke trinkst du an einem typischen Tag, an dem du trinkst?', type: 'select', req: true, options: ['1–2 (oder nie)', '3–4', '5–6', '7–9', '10 oder mehr'], help: '1 Getränk ≈ 0,33 l Bier, 0,125 l Wein oder 4 cl Spirituosen.' },
+        { id: 'au3', label: 'Wie oft trinkst du 6 oder mehr Getränke bei einer Gelegenheit?', type: 'select', req: true, options: ['Nie', 'Seltener als einmal im Monat', 'Jeden Monat', 'Jede Woche', 'Täglich oder fast täglich'] },
+        { id: 'can', label: 'Wie oft konsumierst du Cannabis?', type: 'select', req: true, options: ['Nie', 'Früher, aktuell nicht', 'Seltener als monatlich', 'Monatlich', 'Wöchentlich', 'Täglich oder fast täglich'] },
         { id: 'drog', label: 'Andere Drogen (z. B. Amphetamine, Kokain, MDMA)?', type: 'select', req: true, options: ['Nie', 'Früher, aktuell nicht', 'Gelegentlich', 'Regelmäßig'] },
-        { id: 'stim', label: 'Nehmen Sie verschreibungspflichtige Medikamente (z. B. Stimulanzien) ohne eigene Verordnung?', type: 'yn', req: true },
-        { id: 'nik', label: 'Rauchen oder dampfen Sie?', type: 'select', req: true, options: ['Nein', 'Früher', 'Gelegentlich', 'Täglich'] },
+        { id: 'stim', label: 'Nimmst du verschreibungspflichtige Medikamente (z. B. Stimulanzien) ohne eigene Verordnung?', type: 'yn', req: true },
+        { id: 'nik', label: 'Rauchst oder dampfst du?', type: 'select', req: true, options: ['Nein', 'Früher', 'Gelegentlich', 'Täglich'] },
         { id: 'koff', label: 'Tassen Kaffee / Energydrinks pro Tag', type: 'number', req: true, min: 0, max: 30 }
       ]}
     ]
   },
 
   { id: 'anamnese', group: 'Biografie', title: 'Lebensgeschichte & Gesundheit', type: 'form', required: true,
-    intro: 'Die biografische Anamnese ist der zeitaufwendigste Teil der Diagnostik. Wer sie vorbereitet mitbringt, verkürzt das Gespräch erheblich. Fragen Sie für die frühe Kindheit Ihre Eltern.',
+    intro: 'Die biografische Anamnese ist der zeitaufwendigste Teil der Diagnostik. Wer sie vorbereitet mitbringt, verkürzt das Gespräch erheblich. Frag für die frühe Kindheit deine Eltern.',
     sections: [
       { title: 'Schwangerschaft, Geburt, frühe Kindheit', fields: [
         { id: 'ss', label: 'Besonderheiten in Schwangerschaft oder Geburt', type: 'checks', options: ['Frühgeburt (vor der 37. Woche)', 'Geringes Geburtsgewicht', 'Komplikationen bei der Geburt', 'Rauchen in der Schwangerschaft', 'Alkohol in der Schwangerschaft', 'Keine bekannt', 'Unbekannt'] },
@@ -354,8 +354,8 @@ const MODULES = [
         { id: 'fam_psych', label: 'Andere psychische Erkrankungen oder Sucht in der Familie', type: 'textarea' }
       ]},
       { title: 'Ressourcen', fields: [
-        { id: 'staerken', label: 'Ihre Stärken (z. B. Kreativität, Hilfsbereitschaft, Energie in Krisen)', type: 'textarea' },
-        { id: 'strategien', label: 'Was hilft Ihnen bisher? (Listen, Wecker, Sport, Kaffee …)', type: 'textarea' }
+        { id: 'staerken', rl: 'Stärken', label: 'Deine Stärken (z. B. Kreativität, Hilfsbereitschaft, Energie in Krisen)', type: 'textarea' },
+        { id: 'strategien', rl: 'Hilfreiche Strategien', label: 'Was hilft dir bisher? (Listen, Wecker, Sport, Kaffee …)', type: 'textarea' }
       ]}
     ]
   },
@@ -390,12 +390,12 @@ const MODULES = [
       { title: 'Beruf und Alltag', items: [
         { id: 'arbzeug', text: 'Arbeits- und Ausbildungszeugnisse, ggf. Abmahnungen' },
         { id: 'tagebuch', text: 'Symptom- und Schlaftagebuch über 1–2 Wochen', help: 'Kurze Notizen: Was hat heute nicht geklappt, wie habe ich geschlafen, Kaffee/Alkohol.' },
-        { id: 'fragen', text: 'Liste Ihrer Fragen an die Ärztin/den Arzt (siehe „Fragen für den Termin“)' }
+        { id: 'fragen', text: 'Liste deiner Fragen an die Ärztin/den Arzt (siehe „Fragen für den Termin“)' }
       ]}
     ]
   },
   { id: 'arztfragen', group: 'Vorbereitung', title: 'Fragen für den Termin', type: 'form', recommended: true,
-    intro: 'In der Aufregung des Termins gehen Fragen leicht verloren. Markieren Sie, was Sie fragen möchten. Die Auswahl erscheint im Bericht.',
+    intro: 'In der Aufregung des Termins gehen Fragen leicht verloren. Markiere, was du fragen möchtest. Die Auswahl erscheint im Bericht.',
     sections: [
       { title: 'Zur Diagnostik', fields: [
         { id: 'q_diag', label: 'Fragen auswählen', type: 'checks', options: [
@@ -426,7 +426,7 @@ const MODULES = [
           'Was bedeutet eine Diagnose für eine Verbeamtung?',
           'Gibt es einen Nachteilsausgleich für Studium oder Prüfungen?',
           'Muss ich meinen Arbeitgeber informieren?'
-        ], help: 'Das sind sachliche Punkte, die viele erst nach der Diagnose erfahren. Wägen Sie sie mit Ihrer Ärztin oder Ihrem Arzt ab.' },
+        ], help: 'Das sind sachliche Punkte, die viele erst nach der Diagnose erfahren. Wäge sie mit deiner Ärztin oder deinem Arzt ab.' },
         { id: 'q_eigen', label: 'Eigene Fragen', type: 'textarea' }
       ]}
     ]
@@ -437,9 +437,9 @@ const MODULES = [
 
 /* Ablauf in Deutschland */
 const ABLAUF = [
-  { id: 'st1', title: 'Selbsteinschätzung und Unterlagen', who: 'Sie selbst', text: 'Fragebögen in dieser App ausfüllen, Zeugnisse und Befunde sammeln, Bezugspersonen um Fremdbeurteilung bitten.' },
+  { id: 'st1', title: 'Selbsteinschätzung und Unterlagen', who: 'Du selbst', text: 'Fragebögen in dieser App ausfüllen, Zeugnisse und Befunde sammeln, Bezugspersonen um Fremdbeurteilung bitten.' },
   { id: 'st2', title: 'Hausarztpraxis', who: 'Hausärztin/Hausarzt', text: 'Beschwerden schildern, Überweisung zur Psychiatrie mitnehmen (für die Terminservicestelle mit Vermittlungscode). Körperliche Ursachen abklären: Blutbild, Schilddrüse (TSH), Ferritin, ggf. Blutdruck, Puls und EKG.' },
-  { id: 'st3', title: 'Spezialistin oder Spezialisten finden', who: 'Sie selbst', text: 'Die Diagnose stellen Fachärzte für Psychiatrie und Psychotherapie, Nervenärzte, ADHS-Spezialambulanzen (oft an Universitätskliniken) sowie ärztliche und psychologische Psychotherapeuten. Medikamente verordnen dürfen nur Ärztinnen und Ärzte. Termine vermittelt die Terminservicestelle (116117). Lassen Sie sich parallel auf mehrere Wartelisten setzen; Wartezeiten von mehreren Monaten sind üblich.' },
+  { id: 'st3', title: 'Spezialistin oder Spezialisten finden', who: 'Du selbst', text: 'Die Diagnose stellen Fachärzte für Psychiatrie und Psychotherapie, Nervenärzte, ADHS-Spezialambulanzen (oft an Universitätskliniken) sowie ärztliche und psychologische Psychotherapeuten. Medikamente verordnen dürfen nur Ärztinnen und Ärzte. Termine vermittelt die Terminservicestelle (116117). Lass dich parallel auf mehrere Wartelisten setzen; Wartezeiten von mehreren Monaten sind üblich.' },
   { id: 'st4', title: 'Erstgespräch', who: 'Fachärztin/Facharzt', text: 'Schilderung der Beschwerden, erste Screening-Fragebögen (häufig ASRS, WURS-K, ADHS-SB), psychischer Befund, Planung der weiteren Diagnostik.' },
   { id: 'st5', title: 'Ausführliche Diagnostik', who: 'Fachärztin/Facharzt', text: 'Strukturiertes Interview (z. B. DIVA-5, Wender-Reimherr-Interview, ADHS-Diagnose-Checkliste), Selbst- und Fremdbeurteilungsbögen (z. B. HASE, CAARS), Sichtung der Zeugnisse, Fremdanamnese, Abgrenzung anderer Erkrankungen. Optional neuropsychologische Tests (z. B. TAP, QbTest, d2-R). Diese Tests allein können ADHS weder beweisen noch ausschließen.' },
   { id: 'st6', title: 'Befundbesprechung', who: 'Fachärztin/Facharzt', text: 'Mitteilung des Ergebnisses und schriftlicher Befund. Kodiert wird in Deutschland nach ICD-10-GM (z. B. F90.0 einfache Aktivitäts- und Aufmerksamkeitsstörung, F98.8 Aufmerksamkeitsstörung ohne Hyperaktivität).' },

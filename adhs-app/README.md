@@ -1,4 +1,4 @@
-# ADHS-Diagnosemappe
+# Kopf sortiert. Dein ADHS-Lotse
 
 Eine Web-App, mit der Erwachsene in Deutschland die fachärztliche ADHS-Diagnostik vorbereiten. Sie braucht keine Installation und keinen Server. Alle Angaben bleiben im Browser (`localStorage`).
 
@@ -18,7 +18,7 @@ Eine Web-App, mit der Erwachsene in Deutschland die fachärztliche ADHS-Diagnost
 | Ergebnis | Unverbindliche Einschätzung (erst wenn alle Pflichtmodule fertig sind), Bericht für die Praxis, Kopieren/Drucken/Sichern/Laden |
 
 ## Bedienung für Menschen mit ADHS
-Die Oberfläche folgt Empfehlungen für kognitive Barrierefreiheit (W3C, „Making Content Usable for People with Cognitive and Learning Disabilities“):
+Die App spricht ihre Nutzerinnen und Nutzer mit „du“ an; der Arztbericht bleibt sachlich. Die Oberfläche folgt Empfehlungen für kognitive Barrierefreiheit (W3C, „Making Content Usable for People with Cognitive and Learning Disabilities“):
 
 - **Eine Frage pro Bildschirm** (Standard): große Antwortflächen, nach der Antwort automatisch zur nächsten Frage. Bei Fragen mit Beispielfeld wird nicht automatisch weitergeschaltet. Die Listenansicht „Alle auf einmal“ ist jederzeit umschaltbar.
 - **Tastatur:** `1`–`5` antworten, `←`/`→` zurück/weiter, `Esc` schließt Menüs.

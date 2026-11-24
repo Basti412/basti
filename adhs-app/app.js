@@ -1,4 +1,4 @@
-/* ADHS-Diagnosemappe – App-Logik (ohne Abhängigkeiten, Daten nur lokal im Browser) */
+/* Kopf sortiert. Dein ADHS-Lotse – App-Logik (ohne Abhängigkeiten, Daten nur lokal im Browser) */
 'use strict';
 (function () {
   const STORE_KEY = 'adhs-diagnosemappe-v1';
@@ -36,7 +36,7 @@
     const el = $('#save-status'); const btn = $('.set-btn');
     if (btn) btn.classList.toggle('warn', !storageOk);
     if (!el) return;
-    if (!storageOk) { el.className = 'save-status bad'; el.textContent = 'Speichern ist in diesem Browser gerade nicht möglich (z. B. privates Fenster oder gesperrter Speicher). Bitte legen Sie jetzt eine Sicherung an.'; return; }
+    if (!storageOk) { el.className = 'save-status bad'; el.textContent = 'Speichern ist in diesem Browser gerade nicht möglich (z. B. privates Fenster oder gesperrter Speicher). Bitte leg jetzt eine Sicherung an.'; return; }
     if (!state.updated) { el.className = 'save-status'; el.textContent = 'Noch keine Angaben gespeichert.'; return; }
     const d = new Date(state.updated); const today = new Date().toDateString() === d.toDateString();
     el.className = 'save-status ok';
@@ -55,7 +55,7 @@
   const FREMD_FIELDS = [
     { id: 'rater', label: 'Wer füllt diesen Bogen aus? (Vorname oder Rolle)', type: 'text', req: true },
     { id: 'relation', label: 'Beziehung zur beurteilten Person', type: 'select', req: true, options: ['Mutter', 'Vater', 'Geschwister', 'Partner/in', 'Freund/in', 'Andere Verwandte', 'Sonstige'] },
-    { id: 'kennt', label: 'Wie gut kennen Sie die Person im beurteilten Zeitraum?', type: 'select', req: true, options: ['Sehr gut', 'Gut', 'Mittel', 'Eher wenig'] }
+    { id: 'kennt', label: 'Wie gut kennst du die Person im beurteilten Zeitraum?', type: 'select', req: true, options: ['Sehr gut', 'Gut', 'Mittel', 'Eher wenig'] }
   ];
   function fieldsOf(m) {
     if (m.type === 'form') return m.sections.flatMap((s) => s.fields);
@@ -186,18 +186,18 @@
     else if (r.adult.ia >= 5) pres = 'vorwiegend unaufmerksames Erscheinungsbild';
     else if (r.adult.hi >= 5) pres = 'vorwiegend hyperaktiv-impulsives Erscheinungsbild';
     const notes = [];
-    if (r.crit.beginn === 'Erst im Erwachsenenalter') notes.push('Sie geben einen Beginn erst im Erwachsenenalter an. Die Diagnosekriterien verlangen mehrere Symptome vor dem 12. Lebensjahr. Häufig zeigen sich Symptome in der Kindheit nur abgeschwächt oder wurden durch Struktur ausgeglichen – das muss im Interview genau geklärt werden.');
-    if (onlyPhases) notes.push('Die Merkmale treten laut Ihrer Angabe nur in bestimmten Phasen auf. Das spricht eher dafür, dass eine andere Ursache die Beschwerden (mit) erklärt (Kriterium E).');
+    if (r.crit.beginn === 'Erst im Erwachsenenalter') notes.push('Du gibst einen Beginn erst im Erwachsenenalter an. Die Diagnosekriterien verlangen mehrere Symptome vor dem 12. Lebensjahr. Häufig zeigen sich Symptome in der Kindheit nur abgeschwächt oder wurden durch Struktur ausgeglichen – das muss im Interview genau geklärt werden.');
+    if (onlyPhases) notes.push('Die Merkmale treten laut deiner Angabe nur in bestimmten Phasen auf. Das spricht eher dafür, dass eine andere Ursache die Beschwerden (mit) erklärt (Kriterium E).');
     if (r.crit.dauer === 'Nein') notes.push('Die Merkmale bestehen laut Angabe nicht seit mindestens 6 Monaten durchgehend.');
     if (r.flags.some((x) => x.lvl !== 'info')) notes.push('Es gibt Hinweise auf weitere Beschwerdebilder (siehe unten). Diese können ADHS-ähnliche Symptome erzeugen oder zusätzlich bestehen und machen eine sorgfältige Abgrenzung nötig.');
-    if (!r.fremdA.done || !r.fremdK.done) notes.push('Nicht alle Fremdbeurteilungen liegen vor. Ihre Einschätzung wird aussagekräftiger, wenn Bezugspersonen ihre Sicht ergänzen.');
+    if (!r.fremdA.done || !r.fremdK.done) notes.push('Nicht alle Fremdbeurteilungen liegen vor. Deine Einschätzung wird aussagekräftiger, wenn Bezugspersonen ihre Sicht ergänzen.');
     return { A, child, level, score, max, points, pres, notes };
   }
 
   const LEVEL_TEXT = {
-    hoch: { h: 'Deutliche Tendenz zu einem ADHS-typischen Beschwerdebild', d: 'Ihre Angaben erfüllen in der Selbsteinschätzung die wesentlichen Kriterien: genügend Symptome heute, Hinweise aus der Kindheit, mehrere betroffene Lebensbereiche und eine spürbare Beeinträchtigung. Eine fachärztliche Diagnostik ist klar zu empfehlen.' },
-    mittel: { h: 'Teilweise ADHS-typische Merkmale – fachärztliche Abklärung sinnvoll', d: 'Einige, aber nicht alle Kriterien sind in Ihrer Selbsteinschätzung erfüllt oder liegen im Grenzbereich. Das kann auf ADHS hindeuten, aber auch auf andere Ursachen. Eine fachärztliche Einschätzung kann das klären.' },
-    gering: { h: 'Wenige ADHS-typische Merkmale', d: 'Ihre Angaben erfüllen die Kernkriterien in der Selbsteinschätzung nicht. Wenn Sie trotzdem stark belastet sind, lohnt sich eine Abklärung – die Ursache kann eine andere sein, die ebenfalls gut behandelbar ist.' }
+    hoch: { h: 'Deutliche Tendenz zu einem ADHS-typischen Beschwerdebild', d: 'Deine Angaben erfüllen in der Selbsteinschätzung die wesentlichen Kriterien: genügend Symptome heute, Hinweise aus der Kindheit, mehrere betroffene Lebensbereiche und eine spürbare Beeinträchtigung. Eine fachärztliche Diagnostik ist klar zu empfehlen.' },
+    mittel: { h: 'Teilweise ADHS-typische Merkmale – fachärztliche Abklärung sinnvoll', d: 'Einige, aber nicht alle Kriterien sind in deiner Selbsteinschätzung erfüllt oder liegen im Grenzbereich. Das kann auf ADHS hindeuten, aber auch auf andere Ursachen. Eine fachärztliche Einschätzung kann das klären.' },
+    gering: { h: 'Wenige ADHS-typische Merkmale', d: 'Deine Angaben erfüllen die Kernkriterien in der Selbsteinschätzung nicht. Wenn du trotzdem stark belastet bist, lohnt sich eine Abklärung – die Ursache kann eine andere sein, die ebenfalls gut behandelbar ist.' }
   };
 
   /* ---------- Einzelauswertung je Fragebogen ---------- */
@@ -260,7 +260,7 @@
         e.text = e.text.replace('Damit ist Kriterium A in der Selbsteinschätzung erfüllt.', 'Die Bezugsperson beschreibt damit ein ADHS-typisches Bild.');
         if (self.done) {
           const agree = DSM_ITEMS.filter((it) => (Number(val(id, it.id)) >= 2) === (Number(val(adult ? 'dsm-aktuell' : 'dsm-kindheit', it.id)) >= 2)).length;
-          e.details.push(`Übereinstimmung mit Ihrer Selbsteinschätzung: ${agree} von 18 Merkmalen`);
+          e.details.push(`Übereinstimmung mit deiner Selbsteinschätzung: ${agree} von 18 Merkmalen`);
         }
         break;
       }
@@ -268,7 +268,7 @@
         e.kind = 'adhs'; e.value = r.wurs.sum; e.max = 100; e.cuts = [26, 36];
         e.unit = 'von 100 Punkten'; e.legend = 'unauffällig 0–25 · Grenzbereich 26–35 · auffällig ab 36 (Orientierungswert)';
         i = lvIdx(e.value, e.cuts);
-        e.text = ['Ihre Erinnerungen an die Kindheit zeigen wenige typische Auffälligkeiten.',
+        e.text = ['Deine Erinnerungen an die Kindheit zeigen wenige typische Auffälligkeiten.',
           'Einige typische Auffälligkeiten aus der Kindheit, aber unter dem Orientierungswert.',
           'Viele typische Auffälligkeiten aus der Kindheit. Das stützt einen Beginn vor dem 12. Lebensjahr.'][i];
         e.details.push('Der Orientierungswert ist aus dem WURS-K-Grenzwert umgerechnet und nicht validiert.');
@@ -357,7 +357,7 @@
     if (!EVAL_IDS.includes(m.id)) return '';
     return `<div class="result-slot" id="result-slot" data-mod="${m.id}">${complete(m) ? resultInner(m) : ''}</div>`;
   }
-  function resultInner(m) { return `<p class="eyebrow">Ihr Ergebnis</p>${evalCard(evalModule(m.id), { big: true })}<p class="help">Eine Einordnung Ihrer Angaben, keine Diagnose. Alle Ergebnisse finden Sie unter <a href="#auswertung">Auswertung &amp; Bericht</a>.</p>`; }
+  function resultInner(m) { return `<p class="eyebrow">Dein Ergebnis</p>${evalCard(evalModule(m.id), { big: true })}<p class="help">Eine Einordnung deiner Angaben, keine Diagnose. Alle Ergebnisse findest du unter <a href="#auswertung">Auswertung &amp; Bericht</a>.</p>`; }
 
   /* ---------- Rendering: Felder ---------- */
   function fieldHtml(mid, f) {
@@ -435,7 +435,7 @@
     const items = itemsOf(m);
     items.forEach((it, i) => s.push({ kind: 'item', it, n: i + 1, total: items.length }));
     if (m.type === 'dsm' && m.extra) s.push({ kind: 'fields', title: 'Zum Schluss: Beginn, Dauer und Lebensbereiche', fields: m.extra });
-    if (m.type === 'fremd') s.push({ kind: 'fields', title: 'Möchten Sie noch etwas mitteilen?', fields: [{ id: 'kommentar', label: 'Ihre Anmerkung für die Ärztin/den Arzt (freiwillig)', type: 'textarea' }] });
+    if (m.type === 'fremd') s.push({ kind: 'fields', title: 'Möchtest du noch etwas mitteilen?', fields: [{ id: 'kommentar', label: 'Deine Anmerkung für die Ärztin/den Arzt (freiwillig)', type: 'textarea' }] });
     return s;
   }
   function stepDone(m, st) {
@@ -477,7 +477,7 @@
     } else {
       body = `<div class="f-card"><h2 class="f-q">${esc(st.title)}</h2><div class="fields">${st.fields.map((f) => fieldHtml(m.id, f)).join('')}</div></div>`;
     }
-    const pause = i > 0 && i % PAUSE_EVERY === 0 && st.kind === 'item' ? `<p class="f-pause">Gute Stelle für eine Pause. Alles ist gespeichert – Sie machen später genau hier weiter.</p>` : '';
+    const pause = i > 0 && i % PAUSE_EVERY === 0 && st.kind === 'item' ? `<p class="f-pause">Gute Stelle für eine Pause. Alles ist gespeichert – du machst später genau hier weiter.</p>` : '';
     const canNext = stepDone(m, st);
     const nav = `<div class="f-nav"><button class="btn ghost" data-act="f-prev" ${i === 0 ? 'disabled' : ''}>← Zurück</button><button class="btn ${canNext ? 'primary' : ''}" data-act="f-next">${canNext ? 'Weiter →' : 'Später beantworten →'}</button></div>`;
     const keys = st.kind === 'item' ? `<p class="f-keys">Tastatur: <kbd>1</kbd>–<kbd>${SCALES[m.scale].length}</kbd> antworten · <kbd>←</kbd> zurück · <kbd>→</kbd> weiter</p>` : '';
@@ -486,7 +486,7 @@
   function doneCard(m) {
     const open = stepsOf(m).filter((st) => !stepDone(m, st)).length;
     const nxt = nextModule(m.id);
-    if (open) return `<div class="f-card f-end"><h2 class="f-q">Fast geschafft</h2><p>${open === 1 ? 'Eine Frage ist' : `${open} Fragen sind`} noch offen. Sie können sie jetzt oder später beantworten.</p><div class="row"><button class="btn primary" data-act="f-open">Zur ersten offenen Frage</button>${nxt ? `<a class="btn ghost" href="#${nxt.id}">Erst mit „${esc(nxt.title)}“ weitermachen</a>` : ''}</div></div>`;
+    if (open) return `<div class="f-card f-end"><h2 class="f-q">Fast geschafft</h2><p>${open === 1 ? 'Eine Frage ist' : `${open} Fragen sind`} noch offen. Du kannst sie jetzt oder später beantworten.</p><div class="row"><button class="btn primary" data-act="f-open">Zur ersten offenen Frage</button>${nxt ? `<a class="btn ghost" href="#${nxt.id}">Erst mit „${esc(nxt.title)}“ weitermachen</a>` : ''}</div></div>`;
     return `<div class="f-card f-end is-ok"><div class="f-check" aria-hidden="true">✓</div><h2 class="f-q">Geschafft: ${esc(m.title)}</h2><p>Alle Antworten sind gespeichert.${nxt ? ` Als Nächstes: <b>${esc(nxt.title)}</b> (${restLabel(nxt, minutesLeft(nxt))}).` : ''}</p>
       ${EVAL_IDS.includes(m.id) ? `<div class="f-result">${resultInner(m)}</div>` : ''}
       <div class="row">${nxt ? `<a class="btn primary" href="#${nxt.id}">Weiter zu „${esc(nxt.title)}“</a>` : ''}<a class="btn ghost" href="#start">Zur Übersicht</a><button class="btn ghost" data-act="mode" data-v="liste">Antworten prüfen</button></div></div>`;
@@ -547,14 +547,14 @@
     const adult = m.which === 'adult';
     let html = header(m);
     html += `<section class="card"><h2>Angaben zur beurteilenden Person</h2><div class="fields">${FREMD_FIELDS.map((f) => fieldHtml(m.id, f)).join('')}</div></section>`;
-    html += `<p class="note">${adult ? 'Bitte beurteilen Sie, wie sehr die folgenden Aussagen in den letzten 6 Monaten auf die Person zutrafen. Die Person …' : 'Bitte beurteilen Sie, wie die Person als Kind im Alter von etwa 5 bis 12 Jahren war. Die Person …'}</p><div class="items">`;
+    html += `<p class="note">${adult ? 'Bitte beurteile, wie sehr die folgenden Aussagen in den letzten 6 Monaten auf die Person zutrafen. Die Person …' : 'Bitte beurteile, wie die Person als Kind im Alter von etwa 5 bis 12 Jahren war. Die Person …'}</p><div class="items">`;
     DSM_ITEMS.forEach((it, i) => {
       if (i === 0) html += '<h2 class="grp">Aufmerksamkeit</h2>';
       if (i === 9) html += '<h2 class="grp">Unruhe und Impulsivität</h2>';
-      html += scaleItemHtml(m.id, it, i + 1, '… ' + DSM_SHORT[it.id][adult ? 0 : 1], m.scale, { example: true, placeholder: 'Optional: ein Beispiel, an das Sie sich erinnern' });
+      html += scaleItemHtml(m.id, it, i + 1, '… ' + DSM_SHORT[it.id][adult ? 0 : 1], m.scale, { example: true, placeholder: 'Optional: ein Beispiel, an das du dich erinnerst' });
     });
     html += '</div>';
-    html += `<section class="card"><div class="fields">${fieldHtml(m.id, { id: 'kommentar', label: 'Was möchten Sie der Ärztin/dem Arzt sonst noch mitteilen?', type: 'textarea' })}</div></section>`;
+    html += `<section class="card"><div class="fields">${fieldHtml(m.id, { id: 'kommentar', label: 'Was möchtest du der Ärztin/dem Arzt sonst noch mitteilen?', type: 'textarea' })}</div></section>`;
     return html + resultSlot(m) + navFooter(m);
   }
   const STATUS = ['offen', 'angefragt', 'vorhanden', 'nicht verfügbar', 'nicht nötig'];
@@ -577,7 +577,7 @@
       <td><input type="text" aria-label="Termin / Notiz" id="px-${i}-notiz" data-px="${i}" data-pk="notiz" value="${esc(p.notiz)}" placeholder="Termin, Wartezeit …"></td>
       <td><button class="icon-btn" data-act="px-del" data-i="${i}" aria-label="Zeile löschen">✕</button></td></tr>`).join('');
     return `<header class="mod-head"><p class="eyebrow">Überblick</p><h1>Der Weg zur Diagnose in Deutschland</h1>
-      <p class="intro">Die Diagnostik bei Erwachsenen folgt der S3-Leitlinie ADHS. Sie ist eine klinische Diagnose: Kein einzelner Test beweist oder widerlegt ADHS. Entscheidend sind das ausführliche Gespräch, Ihre Lebensgeschichte, Belege aus der Kindheit, Fremdauskünfte und der Ausschluss anderer Ursachen. Die Kosten trägt bei medizinischer Notwendigkeit die gesetzliche Krankenversicherung.</p></header>
+      <p class="intro">Die Diagnostik bei Erwachsenen folgt der S3-Leitlinie ADHS. Sie ist eine klinische Diagnose: Kein einzelner Test beweist oder widerlegt ADHS. Entscheidend sind das ausführliche Gespräch, deine Lebensgeschichte, Belege aus der Kindheit, Fremdauskünfte und der Ausschluss anderer Ursachen. Die Kosten trägt bei medizinischer Notwendigkeit die gesetzliche Krankenversicherung.</p></header>
       <ol class="steps">${steps}</ol>
       <section class="card"><h2>Was die Diagnose voraussetzt (DSM-5)</h2>
         <dl class="crit">
@@ -587,7 +587,7 @@
           <div><dt>D</dt><dd>Sie beeinträchtigen das soziale, schulische oder berufliche Leben deutlich</dd></div>
           <div><dt>E</dt><dd>Sie lassen sich nicht besser durch eine andere psychische Erkrankung erklären</dd></div>
         </dl></section>
-      <section class="card"><h2>Welche Instrumente Sie beim Facharzt erwarten können</h2>
+      <section class="card"><h2>Welche Instrumente dich beim Facharzt erwarten</h2>
         <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Instrument</th><th>Art</th><th>In dieser App vorbereitet durch</th></tr></thead><tbody>
           <tr><td>ASRS v1.1</td><td>Screening, Selbstbeurteilung</td><td>Screening (ASRS-Typ)</td></tr>
           <tr><td>WURS-K (Teil der HASE)</td><td>Kindheit, Selbstbeurteilung</td><td>Kindheitsskala (WURS-Typ)</td></tr>
@@ -599,17 +599,17 @@
           <tr><td>BDI-II, PHQ-9, GAD-7 u. a.</td><td>Depression und Angst</td><td>PHQ-9, GAD-7</td></tr>
           <tr><td>TAP, QbTest, d2-R, CPT</td><td>Neuropsychologische Tests (optional, nur in der Praxis)</td><td>Nicht möglich – nur Durchführung vor Ort</td></tr>
         </tbody></table></div>
-        <p class="help">Die Originalfragebögen sind urheberrechtlich geschützt und werden von der Praxis ausgegeben. Diese App bildet ihre Inhalte mit eigenen Formulierungen ab, damit Sie die Fragen vorab durchdenken und Beispiele sammeln können.</p></section>
-      <section class="card"><h2>Ihre Facharztsuche</h2>
-        <p class="help">Notieren Sie, wo Sie angefragt haben. Tipp: Die Terminservicestelle erreichen Sie unter 116117 oder online über 116117.de.</p>
+        <p class="help">Die Originalfragebögen sind urheberrechtlich geschützt und werden von der Praxis ausgegeben. Diese App bildet ihre Inhalte mit eigenen Formulierungen ab, damit du die Fragen vorab durchdenken und Beispiele sammeln kannst.</p></section>
+      <section class="card"><h2>Deine Facharztsuche</h2>
+        <p class="help">Notiere, wo du angefragt hast. Tipp: Die Terminservicestelle erreichst du unter 116117 oder online über 116117.de.</p>
         <div class="tbl-wrap"><table class="tbl px"><thead><tr><th>Praxis</th><th>Kontakt am</th><th>Status</th><th>Notiz</th><th><span class="sr">Löschen</span></th></tr></thead><tbody>${rows || '<tr><td colspan="5" class="empty">Noch keine Praxis eingetragen.</td></tr>'}</tbody></table></div>
         <button class="btn" data-act="px-add">+ Praxis hinzufügen</button></section>` + navFooter(m);
   }
 
   function crisisBox(onlyIfNeeded) {
     if (onlyIfNeeded && !(Number(val('phq9', 'p9')) > 0)) return '<div id="crisis-slot"></div>';
-    return `<div id="crisis-slot"><aside class="crisis" role="note"><strong>Wenn es Ihnen gerade sehr schlecht geht</strong>
-      <p>Sie müssen damit nicht allein bleiben. Die TelefonSeelsorge ist kostenlos und rund um die Uhr erreichbar: <b>0800 111 0 111</b> oder <b>0800 111 0 222</b>. Ärztlicher Bereitschaftsdienst: <b>116117</b>. In akuter Gefahr: <b>112</b> oder die nächste psychiatrische Klinik.</p></aside></div>`;
+    return `<div id="crisis-slot"><aside class="crisis" role="note"><strong>Wenn es dir gerade sehr schlecht geht</strong>
+      <p>Du musst damit nicht allein bleiben. Die TelefonSeelsorge ist kostenlos und rund um die Uhr erreichbar: <b>0800 111 0 111</b> oder <b>0800 111 0 222</b>. Ärztlicher Bereitschaftsdienst: <b>116117</b>. In akuter Gefahr: <b>112</b> oder die nächste psychiatrische Klinik.</p></aside></div>`;
   }
 
   function viewDashboard() {
@@ -628,15 +628,16 @@
     const np = progress(nxt);
     const started = allProg.d > 0;
     return `<header class="hero"><p class="eyebrow">Vorbereitung auf die Facharzt-Diagnostik</p>
-      <h1>Ihre ADHS-Diagnosemappe</h1>
-      <p class="intro">Fragebögen, Checklisten und Unterlagen für die ADHS-Diagnostik – in kleinen Etappen. Am Ende steht ein Bericht für Ihre Ärztin oder Ihren Arzt.</p>
+      <h1 class="hero-name">Kopf sortiert<span class="dot">.</span></h1>
+      <p class="hero-tag">Dein ADHS-Lotse</p>
+      <p class="intro">Fragebögen, Checklisten und Unterlagen für die ADHS-Diagnostik – in kleinen Etappen. Am Ende steht ein Bericht für deine Ärztin oder deinen Arzt.</p>
     </header>
     <section class="next-step" aria-labelledby="ns-h">
-      <p class="eyebrow">${reqDone === req.length && nxt.type === 'report' ? 'Alles Wichtige ist erledigt' : started ? 'Hier geht es weiter' : 'Ihr erster Schritt'}</p>
+      <p class="eyebrow">${reqDone === req.length && nxt.type === 'report' ? 'Alles Wichtige ist erledigt' : started ? 'Hier geht es weiter' : 'Dein erster Schritt'}</p>
       <h2 id="ns-h">${esc(nxt.title)}</h2>
       <p class="ns-meta">${nxt.type === 'report' ? 'Einschätzung und Bericht ansehen' : `${np.done ? `${np.done} von ${np.total} beantwortet · ` : ''}${restLabel(nxt, minutesLeft(nxt))}`}</p>
       <a class="btn primary big" href="#${nxt.id}">${nxt.type === 'report' ? 'Zur Auswertung' : np.done ? 'Weitermachen' : 'Starten'} →</a>
-      <p class="help">Sie müssen nicht alles auf einmal schaffen. Jede Antwort wird sofort gespeichert.</p>
+      <p class="help">Du musst nicht alles auf einmal schaffen. Jede Antwort wird sofort gespeichert.</p>
     </section>
     <div class="hero-stats">
       <div class="stat"><span class="sv">${reqDone} / ${req.length}</span><span class="sl">Pflicht-Etappen fertig</span><div class="sbar"><span style="width:${Math.round(reqDone / req.length * 100)}%"></span></div></div>
@@ -647,18 +648,18 @@
     ${groups.map((g) => `<section class="mgroup"><h2>${esc(g)}</h2><div class="mgrid">${MODULES.filter((m) => m.group === g && !['dashboard', 'ablauf', 'report'].includes(m.type)).map(card).join('')}</div></section>`).join('')}
     <p><a href="#ablauf">Wie läuft die Diagnostik in Deutschland ab?</a></p></details>
     <section class="card two">
-      <div><h2>So nutzen Sie die Mappe</h2><ul class="plain">
-        <li>Sie können in beliebiger Reihenfolge arbeiten und jederzeit pausieren.</li>
-        <li>Nehmen Sie sich für die Symptomchecklisten Zeit und notieren Sie konkrete Beispiele.</li>
-        <li>Geben Sie die Fremdbeurteilungen Ihren Bezugspersonen, ohne Ihre Antworten zu zeigen.</li>
+      <div><h2>So funktioniert’s</h2><ul class="plain">
+        <li>Du kannst in beliebiger Reihenfolge arbeiten und jederzeit pausieren.</li>
+        <li>Nimm dir für die Symptomchecklisten Zeit und notiere konkrete Beispiele.</li>
+        <li>Gib die Fremdbeurteilungen deinen Bezugspersonen, ohne deine Antworten zu zeigen.</li>
         <li>Die Einschätzung erscheint, sobald alle Pflichtmodule vollständig sind.</li></ul></div>
-      <div><h2>Ihre Daten</h2><ul class="plain">
+      <div><h2>Deine Daten</h2><ul class="plain">
         <li>Alle Angaben bleiben ausschließlich in diesem Browser auf diesem Gerät.</li>
         <li>Es werden keine Daten an Server übertragen.</li>
-        <li>Eine Sicherung legen Sie unter „Einstellungen → Speichern“ an.</li></ul>
+        <li>Eine Sicherung legst du unter „Einstellungen → Speichern“ an.</li></ul>
         <div class="row"><button class="btn small" data-act="settings" data-tab="speichern">Speichern &amp; Sichern</button></div></div>
     </section>
-    <p class="disclaimer">Diese Mappe ersetzt keine Diagnose. Eine ADHS-Diagnose kann nur eine Fachärztin, ein Facharzt oder eine approbierte Psychotherapeutin bzw. ein approbierter Psychotherapeut nach ausführlicher Untersuchung stellen.</p>`;
+    <p class="disclaimer">Diese App ersetzt keine Diagnose. Eine ADHS-Diagnose kann nur eine Fachärztin, ein Facharzt oder eine approbierte Psychotherapeutin bzw. ein approbierter Psychotherapeut nach ausführlicher Untersuchung stellen.</p>`;
   }
 
   /* ---------- Bericht ---------- */
@@ -669,7 +670,7 @@
     const ready = missing.length === 0;
     const rec = ready ? recommend(r) : null;
     let html = `<header class="mod-head"><p class="eyebrow">Ergebnis</p><h1>Auswertung &amp; Bericht</h1>
-      <p class="intro">Oben steht die unverbindliche Gesamteinschätzung, danach die Tendenz jedes einzelnen Fragebogens. Darunter folgt der Bericht für Ihre Ärztin oder Ihren Arzt mit allen Ergebnissen, Ihren Beispielen und Ihrer Lebensgeschichte.</p></header>`;
+      <p class="intro">Oben steht die unverbindliche Gesamteinschätzung, danach die Tendenz jedes einzelnen Fragebogens. Darunter folgt der Bericht für deine Ärztin oder deinen Arzt mit allen Ergebnissen, deinen Beispielen und deiner Lebensgeschichte.</p></header>`;
     if (!ready) {
       html += `<section class="card gate"><h2>Noch ${missing.length} Pflichtmodul${missing.length > 1 ? 'e' : ''} offen</h2>
         <p>Die Einschätzung erscheint, sobald alle Pflichtmodule vollständig beantwortet sind. Erst dann sind die Ergebnisse untereinander vergleichbar.</p>
@@ -679,12 +680,12 @@
       html += `<section class="verdict lvl-${rec.level}" aria-live="polite">
         <div class="v-scale" role="img" aria-label="Einschätzung: ${esc(L.h)}"><span class="${rec.level === 'gering' ? 'on' : ''}">gering</span><span class="${rec.level === 'mittel' ? 'on' : ''}">teilweise</span><span class="${rec.level === 'hoch' ? 'on' : ''}">deutlich</span></div>
         <p class="eyebrow">Unverbindliche Einschätzung</p><h2>${esc(L.h)}</h2><p>${esc(L.d)}</p>
-        ${rec.pres ? `<p><b>Muster Ihrer Angaben:</b> ${esc(rec.pres)}.</p>` : ''}
+        ${rec.pres ? `<p><b>Muster deiner Angaben:</b> ${esc(rec.pres)}.</p>` : ''}
         <details open><summary>Wie diese Einschätzung zustande kommt (${rec.score.toLocaleString('de-DE')} von ${rec.max.toLocaleString('de-DE')} Punkten)</summary>
           <ul class="pts">${rec.points.map((p) => `<li><span class="pp ${p.p > 0 ? 'plus' : p.p < 0 ? 'minus' : ''}">${p.p > 0 ? '+' : ''}${p.p.toLocaleString('de-DE')}</span>${esc(p.label)}</li>`).join('')}</ul>
           <p class="help">Die Stufe „deutlich“ setzt voraus, dass Kriterium A, Hinweise aus der Kindheit sowie die Kriterien C und D gleichzeitig erfüllt sind. Die Punkte dienen nur der Transparenz.</p></details>
         ${rec.notes.length ? `<div class="notes">${rec.notes.map((n) => `<p>${esc(n)}</p>`).join('')}</div>` : ''}
-        <p class="disclaimer">Diese Einschätzung ist keine Diagnose und nicht validiert. Sie fasst nur Ihre eigenen Angaben nach den Diagnosekriterien zusammen. Viele Merkmale kommen auch bei Menschen ohne ADHS vor. Umgekehrt schließt ein niedriges Ergebnis ADHS nicht sicher aus.</p></section>`;
+        <p class="disclaimer">Diese Einschätzung ist keine Diagnose und nicht validiert. Sie fasst nur deine eigenen Angaben nach den Diagnosekriterien zusammen. Viele Merkmale kommen auch bei Menschen ohne ADHS vor. Umgekehrt schließt ein niedriges Ergebnis ADHS nicht sicher aus.</p></section>`;
     }
     if (r.phq.item9 > 0) html += crisisBox(false);
     html += evalSection(r);
@@ -695,7 +696,7 @@
         <button class="btn primary" data-act="copy-report">Bericht als Text kopieren</button>
         ${FRAMED ? '' : '<button class="btn" data-act="print">Drucken / als PDF speichern</button>'}
       </div>
-      <p class="help">Ihre Angaben werden nur lokal in diesem Browser gespeichert. Sicherung, Laden und Löschen finden Sie unter <button class="linkish" data-act="settings" data-tab="speichern">Einstellungen → Speichern</button>.</p>
+      <p class="help">Deine Angaben werden nur lokal in diesem Browser gespeichert. Sicherung, Laden und Löschen findest du unter <button class="linkish" data-act="settings" data-tab="speichern">Einstellungen → Speichern</button>.</p>
       <p class="help tool-msg" role="status"></p></section>`;
 
     html += `<article class="report" id="report">${reportHtml(r, rec)}</article>`;
@@ -750,7 +751,7 @@
 
     // Anamnese
     h += '<h3>6. Lebensgeschichte und Gesundheit</h3>';
-    MOD.anamnese.sections.forEach((s) => { h += `<h4>${esc(s.title)}</h4><div class="tbl-wrap"><table class="tbl kv"><tbody>${s.fields.map((f) => row(f.label, t(val('anamnese', f.id)))).join('')}</tbody></table></div>`; });
+    MOD.anamnese.sections.forEach((s) => { h += `<h4>${esc(s.title)}</h4><div class="tbl-wrap"><table class="tbl kv"><tbody>${s.fields.map((f) => row(f.rl || f.label, t(val('anamnese', f.id)))).join('')}</tbody></table></div>`; });
 
     // Unterlagen
     const ul = MOD.unterlagen.groups.flatMap((g) => g.items.map((it) => ({ t: it.text, s: val('unterlagen', it.id) || 'offen' })));
@@ -761,9 +762,9 @@
     const qs = [...(q.q_diag || []), ...(q.q_beh || []), ...(q.q_folge || [])];
     h += `<h3>8. Fragen für den Termin</h3>${qs.length || filled(q.q_eigen) ? `<ul class="plain">${qs.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>${filled(q.q_eigen) ? `<p>${esc(q.q_eigen)}</p>` : ''}` : '<p class="muted">Keine Fragen ausgewählt.</p>'}`;
     if (rec) h += `<h3>9. Unverbindliche Einschätzung aus der Selbstauskunft</h3><p>${esc(LEVEL_TEXT[rec.level].h)}${rec.pres ? ` – ${esc(rec.pres)}` : ''}.</p>`;
-    h += `<p class="disclaimer">Selbstauskunft zur Vorbereitung. Die Fragebögen dieser Mappe sind eigene Formulierungen in Anlehnung an DSM-5 und etablierte Instrumente (ASRS, WURS-K, DIVA-5, WRI, WFIRS) und ersetzen diese nicht. PHQ-9, GAD-7 und AUDIT-C entsprechen den frei verwendbaren Originalen.</p>`;
+    h += `<p class="disclaimer">Selbstauskunft zur Vorbereitung. Die Fragebögen dieser App sind eigene Formulierungen in Anlehnung an DSM-5 und etablierte Instrumente (ASRS, WURS-K, DIVA-5, WRI, WFIRS) und ersetzen diese nicht. PHQ-9, GAD-7 und AUDIT-C entsprechen den frei verwendbaren Originalen.</p>`;
     h += `<h3>Quellen</h3><ul class="plain src">${SOURCES.map((s) => `<li>${esc(s.t)}: <a href="${s.u}" target="_blank" rel="noopener">${esc(s.u)}</a></li>`).join('')}</ul>`;
-    h += `<p class="rep-credit">Erstellt mit der ADHS-Diagnosemappe · made by ${BRAND}</p>`;
+    h += `<p class="rep-credit">Erstellt mit „Kopf sortiert. Dein ADHS-Lotse“ · made by ${BRAND}</p>`;
     return h;
   }
 
@@ -789,7 +790,7 @@
   }
   const BRAND = 'BLsolutions';
   function footerHtml() {
-    return `<footer class="site-foot"><span class="foot-app">ADHS-Diagnosemappe</span><span class="foot-sep" aria-hidden="true">·</span><span class="foot-brand">made by <b>${BRAND}</b></span></footer>`;
+    return `<footer class="site-foot"><span class="foot-app">Kopf sortiert.</span><span class="foot-sep" aria-hidden="true">·</span><span>Dein ADHS-Lotse</span><span class="foot-sep" aria-hidden="true">·</span><span class="foot-brand">made by <b>${BRAND}</b></span></footer>`;
   }
   function current() { const h = (location.hash || '').slice(1); return MOD[h] ? h : 'start'; }
   function render() {
@@ -921,12 +922,12 @@
     const act = b.dataset.act;
     if (act === 'px-add') { state.praxen.push({ name: '', datum: new Date().toISOString().slice(0, 10), status: 'angefragt', notiz: '' }); save(); render(); }
     if (act === 'px-del') { state.praxen.splice(Number(b.dataset.i), 1); save(); render(); }
-    if (act === 'copy-report') copy(reportText(), 'Bericht kopiert. Sie können ihn z. B. in eine E-Mail oder ein Dokument einfügen.');
-    if (act === 'copy-json') copy(JSON.stringify(state), 'Daten kopiert. Bewahren Sie den Code sicher auf – er enthält Gesundheitsdaten.');
+    if (act === 'copy-report') copy(reportText(), 'Bericht kopiert. Du kannst ihn z. B. in eine E-Mail oder ein Dokument einfügen.');
+    if (act === 'copy-json') copy(JSON.stringify(state), 'Daten kopiert. Bewahre den Code sicher auf – er enthält Gesundheitsdaten.');
     if (act === 'print') window.print();
     if (act === 'export') {
       const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `adhs-diagnosemappe-${new Date().toISOString().slice(0, 10)}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `kopf-sortiert-${new Date().toISOString().slice(0, 10)}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
     }
     if (act === 'import-text') { try { importData(JSON.parse($('#imp-text').value)); } catch (err) { msg('Der Code konnte nicht gelesen werden. Bitte den vollständigen Code einfügen.'); } }
     if (act === 'reset-ask') {
@@ -1052,7 +1053,7 @@
     if (Date.now() - lastAct < 90000) activeMin += 1;
     if (state.ui.pause && activeMin >= nextPause) {
       nextPause = activeMin + 20;
-      toast(`<b>Sie sind seit ${activeMin} Minuten dabei.</b> Alles ist gespeichert. Eine kurze Pause (Wasser, Bewegung) ist jederzeit möglich – Sie machen danach genau hier weiter.`, 0);
+      toast(`<b>Du bist seit ${activeMin} Minuten dabei.</b> Alles ist gespeichert. Eine kurze Pause (Wasser, Bewegung) ist jederzeit möglich – du machst danach genau hier weiter.`, 0);
     }
   }, 60000);
   render();
